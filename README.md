@@ -1,4 +1,4 @@
-﻿# battleship
+﻿# Battleship
 Executive Summary
 
 Our goal is to create an extensible software implementation of the classic game of Battleship.
@@ -8,5 +8,5 @@ The game of Battleship is a classic board game popular among people around the w
 Our version of Battleship aims to improve on the physical Battleship board game and allow players to easily play together for free, on their computers.
 
 Jason Gao
-
-Edward
+Edward Qin
+Jordan Scher
