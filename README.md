@@ -8,4 +8,5 @@ The game of Battleship is a classic board game popular among people around the w
 Our version of Battleship aims to improve on the physical Battleship board game and allow players to easily play together for free, on their computers.
 
 Jason Gao
+
 Edward
