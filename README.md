@@ -9,4 +9,4 @@ Our version of Battleship aims to improve on the physical Battleship board game 
 
 Jason Gao
 
-Jordan Scher
+Jordan
