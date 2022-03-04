@@ -1,17 +1,17 @@
 package battleship;
 
-import battleship.Board;
+import java.util.Set;
 
 // The BoardView class is an immutable object that represents a player's
 // nxn-sized playing board
-public class BoardView(){
+public class BoardView{
     // Abstraction Function:
     //      b = the playing board to be viewed
 
     // Rep Invariant:
     //      b is not null
 
-    private Board board;
+    private final Board b;
 
     /**
      * Constructs a new Board
@@ -23,7 +23,7 @@ public class BoardView(){
         if (b == null){
             throw new IllegalArgumentException();
         }
-        board = b;
+        this.b = b;
         checkRep();
     }
 
@@ -35,7 +35,7 @@ public class BoardView(){
     /**
      * Returns the Points that have been hit
      *
-     * @returns the Points that have been hit
+     * @return the Points that have been hit
      */
     public Set<Point> getHits(){
         checkRep();
@@ -45,7 +45,7 @@ public class BoardView(){
     /**
      * Returns the Points that have been missed
      *
-     * @returns the Points that have been missed
+     * @return the Points that have been missed
      */
     public Set<Point> getMisses(){
         checkRep();

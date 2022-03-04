@@ -1,6 +1,9 @@
 package battleship;
 
-import battleship.Point;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 // The Board class is a mutable object that represents a player's
 // nxn-sized playing board
@@ -16,21 +19,21 @@ public class Board {
     //      Points in hit are not null
     //      Points in miss are not null
     //      hit and miss do not contain duplicate Points
-    //      parameters in all Points satsify 0 <= p < size
+    //      parameters in all Points satisfy 0 <= p < size
     //      size >= 0
 
-    private Set<Point> hit;
-    private Set<Point> miss;
-    private int size;
+    private final Set<Point> hit;
+    private final Set<Point> miss;
+    private final int size;
     public static final boolean DEBUG = true;
 
     /**
      * Constructs new Board
      *
-     * @throw IllegalArgumentException if size < 0
+     * @throws IllegalArgumentException if size < 0
      */
-    public Board(int size) throws IllegalArgumentException{
-        if (size < 0){
+    public Board(int size) throws IllegalArgumentException {
+        if (size < 0) {
             throw new IllegalArgumentException();
         }
         hit = new HashSet<>();
@@ -39,68 +42,69 @@ public class Board {
         checkRep();
     }
 
-    private void checkRep(){
-        assert(hit != null && miss != null) : "Board must be instantiated";
-        assert(size >= 0) : "Size cannot be less than 0";
-        if (DEBUG){
-            for (Point p : hit){
-                assert(p != null) : "Points cannot be null";
-                assert(!miss.contains(p)) : "Points cannot be in both hit and miss";
-                assert(p.getX() >= 0 && p.getX() < size && p.getY() >= 0 && p.getY() < size)
+    private void checkRep() {
+        assert (hit != null && miss != null) : "Board must be instantiated";
+        assert (size >= 0) : "Size cannot be less than 0";
+        if (DEBUG) {
+            for (Point p : hit) {
+                assert (p != null) : "Points cannot be null";
+                assert (!miss.contains(p)) : "Points cannot be in both hit and miss";
+                assert (p.getX() >= 0 && p.getX() < size && p.getY() >= 0 && p.getY() < size)
                         : "Points must exist in the board";
             }
-            for (Point p : miss){
-                assert(p != null) : "Points cannot be null";
-                assert(p.getX() >= 0 && p.getX() < size && p.getY() >= 0 && p.getY() < size)
+            for (Point p : miss) {
+                assert (p != null) : "Points cannot be null";
+                assert (p.getX() >= 0 && p.getX() < size && p.getY() >= 0 && p.getY() < size)
                         : "Points must exist in the board";
             }
         }
     }
 
+
     /**
      * Marks the given Point as hit
      *
-     * @spec.requires the Point p has not been marked as a miss
      * @param p the Point to be marked as hit
-     * @spec.modifies this
-     * @spec.effects marks the given Point as hit
+     * @return true if the Point was marked as hit, false if it was already guessed
      * @throws IllegalArgumentException if the point is null or does not exist on the Board
      */
-    public void addHit(Point p) throws IllegalArgumentException{
+    public boolean addHit(Point p) throws IllegalArgumentException{
         checkRep();
-        if (p == null || p.getX < 0 || p.getX >= size || p.getY < 0 || p.getY >= size){
+        if (p == null || p.getX() < 0 || p.getX() >= size || p.getY() < 0 || p.getY() >= size){
             throw new IllegalArgumentException();
         }
-        if (!miss.contains(p)){
-            hit.add(p);
+        if (miss.contains(p) || hit.contains(p)){
+            return false;
         }
+        hit.add(p);
         checkRep();
+        return true;
     }
 
     /**
      * Marks the given Point as miss
      *
-     * @spec.requires the Point p has not been marked as a hit
      * @param p the Point to be marked as miss
-     * @spec.modifies this
-     * @spec.effects marks the given Point as miss
+     * @return true if the Point was marked as miss, false if it was already guessed
      * @throws IllegalArgumentException if the point is null or does not exist on the Board
      */
-    public void addMiss(Point p) throws IllegalArgumentException{
+    public boolean addMiss(Point p) throws IllegalArgumentException{
         checkRep();
-        if (p == null || p.getX < 0 || p.getX >= size || p.getY < 0 || p.getY >= size){
+        if (p == null || p.getX() < 0 || p.getX() >= size || p.getY() < 0 || p.getY() >= size){
             throw new IllegalArgumentException();
         }
-        if (!hit.contains(p)) {
-            miss.add(p);
+        if (miss.contains(p) || hit.contains(p)){
+            return false;
         }
+        miss.add(p);
         checkRep();
+        return true;
     }
 
     /**
      * Returns the Points that have been hit
      *
-     * @returns the Points that have been hit
+     * @return the Points that have been hit
      */
     public Set<Point> getHits(){
         checkRep();
@@ -110,12 +114,13 @@ public class Board {
     /**
      * Returns the Points that have been missed
      *
-     * @returns the Points that have been missed
+     * @return the Points that have been missed
      */
     public Set<Point> getMisses(){
         checkRep();
         return Collections.unmodifiableSet(miss);
     }
+
 
     /**
      * Return if the given Point has been guessed
@@ -124,10 +129,10 @@ public class Board {
      * @throws IllegalArgumentException if p is null
      * @return true if the given Point has been guessed on the Board
      */
-    public boolean hasAlreadyGuessed(Point p) {
+    public boolean hasAlreadyGuessed(Point p) throws IllegalArgumentException{
         checkRep();
         if (p == null){
-            return IllegalArgumentException();
+            throw new IllegalArgumentException();
         }
         checkRep();
         return hit.contains(p) || miss.contains(p);
