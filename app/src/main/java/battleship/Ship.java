@@ -30,22 +30,13 @@ public class Ship {
         if (p1 == null || p2 == null) {
             throw new IllegalArgumentException("null start or end point");
         }
-        if (p1.getX() == p2.getX()) {
-            if (p1.getY() < p2.getY()) {
-                startPoint = p1;
-                endPoint = p2;
-            } else {
-                startPoint = p2;
-                endPoint = p1;
-            }
-        } else if (p1.getY() == p2.getY()) {
-            if (p1.getX() < p2.getX()) {
-                startPoint = p1;
-                endPoint = p2;
-            } else {
-                startPoint = p2;
-                endPoint = p1;
-            }
+        if (p1.getX() == p2.getX() && p1.getY() < p2.getY()
+            || p1.getY() == p2.getY() && p1.getX() < p2.getX()) {
+            startPoint = p1;
+            endPoint = p2;
+        } else if (p1.getX() == p2.getX() || p1.getY() == p2.getY()) {
+            startPoint = p2;
+            endPoint = p1;
         } else {
             throw new IllegalArgumentException("start and end point must fall on the same line");
         }
