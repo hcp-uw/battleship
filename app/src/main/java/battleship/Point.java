@@ -6,6 +6,12 @@ package battleship;
  */
 public final class Point {
 
+    // Abstraction Function:
+    //      A Point p represents the cartesian coordinate (p.x, p.y).
+
+    // Representation Invariant:
+    //      none
+
     /**
      * The x-value for this point.
      */
