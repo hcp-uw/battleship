@@ -3,7 +3,8 @@ package battleship;
 import java.util.*;
 
 /**
- * Player is a mutable ADT representing a player in the game.
+ * Player is a mutable ADT representing a player in the game. Each Player must have a unique ID, no other
+ * Player object can have the same ID without being the same player.
  */
 public class Player {
 
@@ -43,13 +44,14 @@ public class Player {
     }
 
     /**
-     * Constructs a new player with ships. This is the only place the
-     * player can get ships.
+     * Constructs a new player with ships. This is the only place the player can get ships.
+     * Additionally, every Player must have a unique ID.
+     * @param id the unique ID for this player
      * @param ships an array of ships for this player
-     * @throws IllegalArgumentException if ships is empty
+     * @throws IllegalArgumentException if ships is empty or null
      */
     public Player(int id, Ship[] ships) {
-        if (ships.length == 0) throw new IllegalArgumentException("Player must have ships!");
+        if (ships == null || ships.length == 0) throw new IllegalArgumentException("Player must have ships!");
         this.playerShips = new ArrayList<>();
         this.playerShips.addAll(Arrays.asList(ships));
 
@@ -64,9 +66,10 @@ public class Player {
      * @param other the other Player to target an attack on
      * @param p the point on the other Player's board to attack
      * @throws IllegalArgumentException if any args are null
-     * @return a boolean indicating whether this attack was valid (targeted a valid cell)
+     * @return a boolean indicating whether this attack was valid (targeted a cell that wasn't attacked before)
      */
     public boolean attack(Player other, Point p) {
+        if (other == null || p == null) throw new IllegalArgumentException("Null inputs to attack");
         checkRep();
         // this means that player only knows about opponents after attacking them...
         if (!this.opponentBoards.containsKey(other)) this.opponentBoards.put(other, new Board(BOARD_SIZE));
@@ -86,6 +89,7 @@ public class Player {
      * @throws IllegalArgumentException if p is null
      */
     public boolean receive(Point p) {
+        if (p == null) throw new IllegalArgumentException("Received an attack on no point");
         checkRep();
         boolean didHit = false;
         for (Ship s : this.playerShips) {
@@ -139,6 +143,18 @@ public class Player {
     public int hashCode() {
         // kind of lazy - I added a field just to avoid having to iterate everything for equals and hashCode
         return this.playerId; // already an int
+    }
+
+    @Override
+    public String toString() {
+        String id = "ID: " + this.playerId;
+        StringBuilder ships = new StringBuilder("Ships: [");
+        getShips().forEach((ship) -> ships.append(ship).append(", "));
+        ships.append("]");
+
+        String board = "Board: " + this.playerBoard;
+
+        return id + "\n" + ships + "\n" + board;
     }
 
 }
