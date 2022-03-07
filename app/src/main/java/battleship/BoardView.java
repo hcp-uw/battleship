@@ -51,4 +51,27 @@ public class BoardView{
         checkRep();
         return b.getMisses();
     }
+
+    /**
+     * Return if the given Point has been guessed
+     *
+     * @param p the Point to be checked
+     * @return true if the given Point has been guessed on the Board
+     * @throws IllegalArgumentException if p is null
+     */
+    public boolean hasAlreadyGuessed(Point p) throws IllegalArgumentException {
+        checkRep();
+        return hasAlreadyGuessed(p);
+    }
+
+    /**
+     *
+     * Returns String form of Board
+     *
+     * @return a String representation of the board, with axis labels, and the key 'x'=hit, 'o'=miss, '-'=untouched
+     */
+    public String toString(){
+        checkRep();
+        return b.toString();
+    }
 }
