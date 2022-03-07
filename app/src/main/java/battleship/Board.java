@@ -138,4 +138,21 @@ public class Board {
         return hit.contains(p) || miss.contains(p);
     }
 
+    /**
+     *
+     * Returns String form of Board
+     *
+     * @return a String representation of the board, indicating points that have been hit and missed
+     */
+    public String toString(){
+        String hits = "Hits:";
+        for (Point p: hit){
+            hits += " " + p.toString();
+        }
+        String misses = "Mises:";
+        for (Point p : miss){
+            misses += " " + p.toString();
+        }
+        return hits + "\n" + misses;
+    }
 }
