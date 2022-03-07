@@ -68,12 +68,12 @@ public class Board {
      * @return true if the Point was marked as hit, false if it was already guessed
      * @throws IllegalArgumentException if the point is null or does not exist on the Board
      */
-    public boolean addHit(Point p) throws IllegalArgumentException{
+    public boolean addHit(Point p) throws IllegalArgumentException {
         checkRep();
-        if (p == null || p.getX() < 0 || p.getX() >= size || p.getY() < 0 || p.getY() >= size){
+        if (p == null || p.getX() < 0 || p.getX() >= size || p.getY() < 0 || p.getY() >= size) {
             throw new IllegalArgumentException();
         }
-        if (miss.contains(p) || hit.contains(p)){
+        if (miss.contains(p) || hit.contains(p)) {
             return false;
         }
         hit.add(p);
@@ -88,12 +88,12 @@ public class Board {
      * @return true if the Point was marked as miss, false if it was already guessed
      * @throws IllegalArgumentException if the point is null or does not exist on the Board
      */
-    public boolean addMiss(Point p) throws IllegalArgumentException{
+    public boolean addMiss(Point p) throws IllegalArgumentException {
         checkRep();
-        if (p == null || p.getX() < 0 || p.getX() >= size || p.getY() < 0 || p.getY() >= size){
+        if (p == null || p.getX() < 0 || p.getX() >= size || p.getY() < 0 || p.getY() >= size) {
             throw new IllegalArgumentException();
         }
-        if (miss.contains(p) || hit.contains(p)){
+        if (miss.contains(p) || hit.contains(p)) {
             return false;
         }
         miss.add(p);
@@ -106,7 +106,7 @@ public class Board {
      *
      * @return the Points that have been hit
      */
-    public Set<Point> getHits(){
+    public Set<Point> getHits() {
         checkRep();
         return Collections.unmodifiableSet(hit);
     }
@@ -116,7 +116,7 @@ public class Board {
      *
      * @return the Points that have been missed
      */
-    public Set<Point> getMisses(){
+    public Set<Point> getMisses() {
         checkRep();
         return Collections.unmodifiableSet(miss);
     }
@@ -126,12 +126,12 @@ public class Board {
      * Return if the given Point has been guessed
      *
      * @param p the Point to be checked
-     * @throws IllegalArgumentException if p is null
      * @return true if the given Point has been guessed on the Board
+     * @throws IllegalArgumentException if p is null
      */
-    public boolean hasAlreadyGuessed(Point p) throws IllegalArgumentException{
+    public boolean hasAlreadyGuessed(Point p) throws IllegalArgumentException {
         checkRep();
-        if (p == null){
+        if (p == null) {
             throw new IllegalArgumentException();
         }
         checkRep();
