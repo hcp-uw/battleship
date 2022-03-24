@@ -68,7 +68,7 @@ public class Player {
      * @throws IllegalArgumentException if any args are null
      * @return a boolean indicating whether this attack was valid (targeted a cell that wasn't attacked before)
      */
-    public boolean attack(Player other, Point p) {
+    public void attack(Player other, Point p) {
         if (other == null || p == null) throw new IllegalArgumentException("Null inputs to attack");
         checkRep();
         // this means that player only knows about opponents after attacking them...
@@ -79,7 +79,7 @@ public class Player {
         if (result) validResult = this.opponentBoards.get(other).addHit(p);
         else validResult = this.opponentBoards.get(other).addMiss(p);
         checkRep();
-        return validResult; // this is sketchy and relies on Board returning false on already guessed spots
+        if (!validResult) throw new IllegalArgumentException("Tried to attack position that was already guessed");
     }
 
     /**
