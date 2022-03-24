@@ -38,4 +38,14 @@ public class PlayerTest {
         assertNotEquals(p2, p1);
         assertNotEquals(p1, p2);
     }
+
+    @Test
+    public void testRepeatAttackThrowsException() {
+        Player p1 = new Player(0, new Ship[] {new Ship(new Point(0,0), new Point(0,10))});
+        Player p2 = new Player(1, new Ship[] {new Ship(new Point(1,1), new Point(1,10))});
+
+        p1.attack(p2, new Point(0, 1));
+
+        assertThrows(IllegalArgumentException.class, () -> p1.attack(p2, new Point(0,1)));
+    }
 }
