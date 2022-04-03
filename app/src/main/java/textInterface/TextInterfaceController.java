@@ -1,5 +1,7 @@
 package textInterface;
 
+import battleship.Point;
+
 import battleship.Game;
 
 public class TextInterfaceController implements InputHandler{
@@ -30,7 +32,6 @@ public class TextInterfaceController implements InputHandler{
      * @param view  A view to use to display data to the user.
      */
     public TextInterfaceController(Game game, TextInterfaceView view){
-        // TODO: I feel like this should construct the game or something, not just take a reference to it -Jason
         this.game = game;
         this.view = view;
         this.state = "start";
@@ -106,10 +107,19 @@ public class TextInterfaceController implements InputHandler{
         if (parsed.length < 2 || checkInvalidPoint(parsed[0]) || checkInvalidPoint(parsed[1])){
             view.showErrorUnknownCommand();
             view.setupPrompt();
+        } else if (){
+            // TODO: restrict valid inputs by their ship length
+
+        } else {
+            // TODO: update state of game and learn that setup phase has passed when 5 ships have been placed
+            // Probably stored in game; how does game know what size and how many ships are left?
+            game.addShip(parsed[0].charAt(0) - 'A', parsed[0].charAt(1) - '0', parsed[1].charAt(0) - 'A', parsed[1].charAt(1) - '0');
+            if (game.getPhase().equals("setup")){
+                view.setupPrompt();
+            } else {
+                view.attackPrompt();
+            }
         }
-        // TODO: update state of game and learn that setup phase has passed when 5 ships have been placed
-        // TODO: restrict valid inputs by their ship length
-        game.addShip(parsed[0].charAt(0) - 'A', parsed[0].charAt(1) - '0', parsed[1].charAt(0) - 'A', parsed[1].charAt(1) - '0');
     }
 
     /**
