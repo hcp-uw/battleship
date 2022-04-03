@@ -1,5 +1,7 @@
 package textInterface;
 
+import battleship.Game;
+
 public class TextInterfaceController implements InputHandler{
 
     // This class does not represent an ADT
@@ -28,6 +30,7 @@ public class TextInterfaceController implements InputHandler{
      * @param view  A view to use to display data to the user.
      */
     public TextInterfaceController(Game game, TextInterfaceView view){
+        // TODO: I feel like this should construct the game or something, not just take a reference to it -Jason
         this.game = game;
         this.view = view;
         this.state = "start";
@@ -106,7 +109,7 @@ public class TextInterfaceController implements InputHandler{
         }
         // TODO: update state of game and learn that setup phase has passed when 5 ships have been placed
         // TODO: restrict valid inputs by their ship length
-        game.addShip(parsed[0].charAt(0) - 'A', parsed[0].charAt(1) - '0', parsed[1].charAt(0) - 'A', parsed[1].charAt(1) - '0')
+        game.addShip(parsed[0].charAt(0) - 'A', parsed[0].charAt(1) - '0', parsed[1].charAt(0) - 'A', parsed[1].charAt(1) - '0');
     }
 
     /**
