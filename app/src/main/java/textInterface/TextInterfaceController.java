@@ -9,6 +9,11 @@ public class TextInterfaceController implements InputHandler{
     // This class does not represent an ADT
 
     /**
+     * Possible orientations of Ships
+     */
+    private static final char[] ORIENTATIONS = new char[]{'u', 'd', 'l', 'r'};
+
+    /**
      * The data-carrier and processor for the application.
      */
     private Game game;
@@ -19,10 +24,10 @@ public class TextInterfaceController implements InputHandler{
     private TextInterfaceView view;
 
     /**
-     *  The state/phase of the game
+     * Temporary data storing the pivot point of the ship to be placed
      */
-    // TODO: this could be stored in the Game
-    private String state;
+    private Point p;
+
 
     /**
      * Creates a new TextInterfaceController with the provided model and view
@@ -34,7 +39,6 @@ public class TextInterfaceController implements InputHandler{
     public TextInterfaceController(Game game, TextInterfaceView view){
         this.game = game;
         this.view = view;
-        this.state = "start";
     }
 
 
@@ -46,8 +50,9 @@ public class TextInterfaceController implements InputHandler{
      * is being shut down. Calling this method transfers control of the current
      * thread to the provided {@link TextInterfaceView}.
      */
-    public void startMenu() {
-        view.startMenu(); // for now, asks what mode the player would like (2p or CPU)
+    public void start() {
+        // TODO: decide what is returned by game.getShipsToBePlaced(int pid)
+        view.placeShipPrompt(game.getShipsToBePlaced(game.getCurrentPlayer()).get(0));
         view.begin();
     }
 
@@ -62,15 +67,10 @@ public class TextInterfaceController implements InputHandler{
             System.out.println(input);
             return;
         }
-        switch(state){
-            // phases - menu
-            case "start":
-                doInputStart(input);
-                break;
-
+        switch(game.getPhase()){
             // phases - setup
             case "setup":
-                doInputSetup(input);
+                doShipSetup(input);
                 break;
 
             // phases - attack
@@ -84,40 +84,40 @@ public class TextInterfaceController implements InputHandler{
     }
 
     /**
-     * Responds to user's choice of the mode in the start menu
-     */
-    private void doInputStart(String input){
-        if (!input.equals("1") && !input.equals("2")){
-            view.showErrorUnknownCommand();
-            view.startMenu();
-        }
-        if (input.equals("1")){
-            // TODO: need to know exact parameters/implementation in Game
-            game.setup(0, 2);
-        } else {
-            game.setup(1, 1);
-        }
-    }
-
-    /**
      * Responds to user's input to set up the locations of their ship
      */
-    private void doInputSetup(String input){
-        String[] parsed = input.split(" ");
-        if (parsed.length < 2 || checkInvalidPoint(parsed[0]) || checkInvalidPoint(parsed[1])){
-            view.showErrorUnknownCommand();
-            view.setupPrompt();
-        } else if (){
-            // TODO: restrict valid inputs by their ship length
+    private void doShipSetup(String input){
+        // check validity
+        if (p == null && (input.length() < 2 || checkInvalidPoint(input))) {
+            view.showErrorUnknownInput();
+            view.placeShipPrompt(game.getShipsToBePlaced(game.getCurrentPlayer()).get(0));
+            return;
+        } else if (p != null && checkInvalidOrientation(input)){
+            view.showErrorUnknownInput();
+            view.shipOrientationPrompt();
+            return;
+        }
 
+        // deal with input
+        if (p == null){
+            p = new Point(input.charAt(0) - 'A', input.charAt(1) - '0');
+            view.shipOrientationPrompt();
         } else {
-            // TODO: update state of game and learn that setup phase has passed when 5 ships have been placed
-            // Probably stored in game; how does game know what size and how many ships are left?
-            game.addShip(parsed[0].charAt(0) - 'A', parsed[0].charAt(1) - '0', parsed[1].charAt(0) - 'A', parsed[1].charAt(1) - '0');
+            char orientation = input.toLowerCase().charAt(0);
+            boolean valid = game.addShip(p, calculateSecond(orientation,game.getShipsToBePlaced(game.getCurrentPlayer()).get(0));
+
+            // Note that p is not saved because if the Point is on a ship, both point and orientation need to be rechosen,
+            // not just the orientation
+            p = null;
+            if (!valid) {
+                view.showErrorInvalidPosition();
+            }
+
+            // check phase
             if (game.getPhase().equals("setup")){
-                view.setupPrompt();
+                view.placeShipPrompt(game.getShipsToBePlaced(game.getCurrentPlayer()).get(0));
             } else {
-                view.attackPrompt();
+                view.attackPrompt(game.getCurrentPlayer());
             }
         }
     }
@@ -127,18 +127,60 @@ public class TextInterfaceController implements InputHandler{
      */
     private void doInputAttack(String input){
         if (input.length() < 2 || checkInvalidPoint(input)){
-            view.showErrorUnknownCommand();
-            view.attackPrompt();
+            view.showErrorUnknownInput();
+            view.attackPrompt(game.getCurrentPlayer());
         }
-        // TODO: how to call attack given CPU or local mode, and how to indicate which player is being attacked
-        game.attack(input.charAt(0) - 'A', input.charAt(1) - '0'); // converted to point in the Game class
+        Point temp = new Point(input.toUpperCase().charAt(0), input.charAt(1));
+
+        // TODO: discuss how to get attacked player (only for 2p) - possibly overload method
+        game.attack(temp, );
+
+        // read current phase
+        if (game.getPhase().equals("attack")){
+            view.attackPrompt(game.getCurrentPlayer());
+        } else {
+            view.showWinner(game.getCurrentPlayer());
+            view.exit();
+        }
     }
 
     /**
      * private method to check if input point is valid
      */
     private boolean checkInvalidPoint(String input){
-        return input.charAt(0) < 'A' || input.charAt(0) > 'A' + game.size() ||
-                input.charAt(1) < '0' || input.charAt(1) > '0' + game.size();
+        char letter = input.toUpperCase().charAt(0);
+        char number = input.charAt(1);
+        return letter < 'A' || letter > 'A' + game.size() || number < '0' || number > '0' + game.size();
+    }
+
+    /**
+     * private method to check if input orientation is valid
+     */
+    private boolean checkInvalidOrientation(String input) {
+        char check = input.toLowerCase().charAt(0);
+        for (char c: ORIENTATIONS){
+            if (c == check){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * private method to calculate second point
+     */
+    private Point calculateSecond(char orientation, int length){
+        int x = p.getX();
+        int y = p.getY();
+        if (orientation == ORIENTATIONS[0]) {
+            y -= length;
+        } else if (orientation == ORIENTATIONS[1]){
+            y += length;
+        } else if (orientation == ORIENTATIONS[2]){
+            x -= length;
+        } else if (orientation == ORIENTATIONS[3]) {
+            x += length;
+        }
+        return new Point(x, y);
     }
 }
