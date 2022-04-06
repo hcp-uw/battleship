@@ -50,15 +50,36 @@ public class Player {
      * @param ships an array of ships for this player
      * @throws IllegalArgumentException if ships is empty or null
      */
-    public Player(int id, Ship[] ships) {
+    public Player(int id, Ship[] ships, int board_size) {
         if (ships == null || ships.length == 0) throw new IllegalArgumentException("Player must have ships!");
         this.playerShips = new ArrayList<>();
         this.playerShips.addAll(Arrays.asList(ships));
 
-        this.playerBoard = new Board(BOARD_SIZE);
+        this.playerBoard = new Board(board_size);
         this.opponentBoards = new HashMap<>();
         this.playerId = id;
         checkRep();
+    }
+
+    public Player(int id, Ship[] ships) {
+        this(id, ships, BOARD_SIZE);
+    }
+
+    /**
+     * To add ships after construction
+     * @param p1 Point start of ship
+     * @param p2 Point end of ship
+     */
+    public void addShip(Point p1, Point p2) {
+        this.playerShips.add(new Ship(p1, p2));
+    }
+
+    /**
+     * to add ships after construction
+     * @param s Ship to add
+     */
+    public void addShip(Ship s) {
+        this.playerShips.add(s);
     }
 
     /**
@@ -128,6 +149,7 @@ public class Player {
      */
     public List<Ship> getShips() {
         checkRep();
+        // CAUTION! not a deep copy so ships can be modified TODO fix this!
         return new ArrayList<>(this.playerShips);
     }
 

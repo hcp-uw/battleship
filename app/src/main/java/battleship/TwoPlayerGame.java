@@ -15,7 +15,8 @@ public class TwoPlayerGame extends Game {
      * @return a boolean representing whether the attack succeeded (point wasn't already guessed)
      */
     public boolean attack(Point p) {
-        return false;
+        return this.attack(this.getCurrentPlayer(),
+                this.PlayerIdList.get((this.currentPlayer + 1) % this.PlayerIdList.size()), p);
     }
 
     /**
@@ -25,6 +26,21 @@ public class TwoPlayerGame extends Game {
      * @return a boolean representing whether the attack succeeded (point wasn't already guessed)
      */
     public boolean attack(int x, int y) {
-        return false;
+        return attack(new Point(x, y));
+    }
+
+    @Override
+    public void processTurn(Point p) {
+        if (this.currentGamePhase == 0) {
+            int bufSize = this.pointBuffer.size();
+            if (bufSize % 2 == 1) {
+                this.addShip(this.pointBuffer.get(bufSize - 1), p);
+            }
+            this.pointBuffer.add(p);
+        } else if (currentGamePhase == 1) {
+            this.attack(p);
+            this.pointBuffer.add(p);
+        }
+        // and do nothing if game phase is something else
     }
 }
