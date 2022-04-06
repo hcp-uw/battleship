@@ -61,7 +61,7 @@ public class BoardView{
      */
     public boolean hasAlreadyGuessed(Point p) throws IllegalArgumentException {
         checkRep();
-        return hasAlreadyGuessed(p);
+        return b.hasAlreadyGuessed(p);
     }
 
     /**
