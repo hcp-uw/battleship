@@ -279,7 +279,7 @@ public class Game {
     /**
      * Gets the Player ID (PID) of the player whose turn is next, the player whose input
      * should take the next turn
-     * TODO: ensure that if the game state is "end" this returns the winner
+     * if the game phase is "end" this returns the winner of the game
      * @return the integer PID of the current player to go
      */
     public int getCurrentPlayer() {
@@ -288,7 +288,7 @@ public class Game {
 
     /**
      * Gets the player to go by the string name that their PID is mapped to in this.playerNames
-     * @return
+     * @return returns the name of the player to go
      */
     public String getCurrentPlayerName() {
         int curPid = getCurrentPlayer();
@@ -374,6 +374,15 @@ public class Game {
      */
     private void endPhase() {
         if (this.currentGamePhase < GAME_PHASES.length - 1) this.currentGamePhase++;
+    }
+
+    /**
+     * call to end the game
+     * @param winnerPid the PID of the winning player
+     */
+    private void endGame(int winnerPid) {
+        this.currentPlayer = winnerPid;
+        this.currentGamePhase = 3;
     }
 }
 
