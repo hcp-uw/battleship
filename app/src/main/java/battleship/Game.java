@@ -97,9 +97,9 @@ public class Game {
      */
     public void processTurn(Point p) {
         if (this.getPhase().equals("setup")) {
-            int bufSize = this.pointBuffer.size();
+            int bufSize = this.pointBuffer.size(); // TODO: make this work with the point + orientation way of specifying a ship
             if (bufSize % 2 == 1) {
-                this.addShip(this.pointBuffer.get(bufSize - 1), p);
+                this.addShip(this.getLastPoint(), p);
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {
                     if (isSetupPhaseDone()) {
                         endPhase();
@@ -331,7 +331,7 @@ public class Game {
      * @param pid the PID of the player to check for
      * @return a boolean indicating if the player is done or not
      */
-    private boolean isPlayerDoneWithSetup(int pid) {
+    public boolean isPlayerDoneWithSetup(int pid) {
         for (int i: getShipsToBePlaced(pid)) {
             if (i > 0) {
                 return false;
@@ -341,10 +341,12 @@ public class Game {
     }
 
     /**
-     * checks to see if the setup phase is done; all players have set up all their ships
+     * checks to see if the setup phase is effectively finished; all players have set up all their ships
+     * does not check what the game's current phase is. If this returns true, the game phase should not be
+     * "setup", or should be set to something else shortly after
      * @return a boolean indicating if the setup phase has finished or not
      */
-    private boolean isSetupPhaseDone() {
+    public boolean isSetupPhaseDone() {
         for (int pid: this.PlayerIdList) {
             if (!isPlayerDoneWithSetup(pid)) {
                 return false;
@@ -364,7 +366,7 @@ public class Game {
     /**
      * ends the current player's turn, and sets this.currentPlayer to the next player to go
      */
-    private void endTurn() {
+    public void endTurn() {
         // loop around the players
         this.currentPlayer = (this.currentPlayer + 1) % this.PlayerIdList.size();
     }
@@ -372,7 +374,7 @@ public class Game {
     /**
      * called to end phases
      */
-    private void endPhase() {
+    public void endPhase() {
         if (this.currentGamePhase < GAME_PHASES.length - 1) this.currentGamePhase++;
     }
 
@@ -383,6 +385,15 @@ public class Game {
     private void endGame(int winnerPid) {
         this.currentPlayer = winnerPid;
         this.currentGamePhase = 3;
+    }
+
+    /**
+     * returns a copy of the last point in the buffer
+     * @return a Point
+     */
+    public Point getLastPoint() {
+        Point last = this.pointBuffer.get(this.pointBuffer.size() - 1);
+        return new Point(last.getX(), last.getY());
     }
 }
 

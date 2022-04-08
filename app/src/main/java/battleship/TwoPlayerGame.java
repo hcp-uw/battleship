@@ -33,7 +33,14 @@ public class TwoPlayerGame extends Game {
         if (getPhase().equals("setup")) {
             int bufSize = super.pointBuffer.size();
             if (bufSize % 2 == 1) {
-                super.addShip(super.pointBuffer.get(bufSize - 1), p);
+                super.addShip(this.getLastPoint(), p);
+                if (isPlayerDoneWithSetup(getCurrentPlayer())) {
+                    if (isSetupPhaseDone()) {
+                        endPhase();
+                    } else {
+                        endTurn();
+                    }
+                }
             }
             super.pointBuffer.add(p);
         } else if (getPhase().equals("playing")) {
