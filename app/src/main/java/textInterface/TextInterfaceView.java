@@ -88,7 +88,7 @@ public class TextInterfaceView implements View {
     }
 
     @Override
-    public void placingShipLength(int length) {
+    public void placeShipOfLength(int length) {
         System.out.print("Where to place ship of length " + length + ": ");
     }
 
