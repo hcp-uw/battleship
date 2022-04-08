@@ -61,9 +61,14 @@ public interface View {
     void shipLengthPrompt();
 
     /**
+     *
+     */
+    void placingShipLength(int length);
+
+    /**
      * Displays an error to the user about an unknown command.
      */
-    void showErrorUnknownCommand();
+    void showErrorUnknownInput();
 
     /**
      * Displays an error to the user about an unknown board position.
