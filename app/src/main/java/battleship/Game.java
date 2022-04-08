@@ -19,10 +19,10 @@ public class Game {
     // 3 phases of game
     private static final String[] GAME_PHASES = {"setup", "playing", "end"};
 
-    private int gameBoardSize;
+    private final int gameBoardSize;
     private int currentGamePhase;
-    private Map<Integer, Player> players;
-    private List<Integer> PlayerIdList;
+    private final Map<Integer, Player> players;
+    private final List<Integer> PlayerIdList; // a list containing PIDs
     private int currentPlayer; // current player represented by index in PID list
     private List<GameListener> listeners;
     private final int[] allowableShipSet;
@@ -53,7 +53,7 @@ public class Game {
         this.currentPlayer = -1;
 
         this.PlayerIdList = new ArrayList<>();
-        this.players.keySet().iterator().forEachRemaining((e) -> this.PlayerIdList.add(e));
+        this.players.keySet().iterator().forEachRemaining(this.PlayerIdList::add);
         this.allowableShipSet = shipsInfo;
 
         this.pointBuffer = new ArrayList<>();
@@ -87,6 +87,35 @@ public class Game {
             int pid = baseId + 1;
             this.players.put(pid, new Player(pid, new Ship[0], boardSize));
         }
+    }
+
+    /**
+     * Knowing the current player and game phase, only certain things can happen, so given a point we can process
+     * an entire step of the game being played (or half a step if in setup). This modifies the game state -
+     * phase and current Player
+     * @param p a point to process
+     */
+    public void processTurn(Point p) {
+        if (this.getPhase().equals("setup")) {
+            int bufSize = this.pointBuffer.size();
+            if (bufSize % 2 == 1) {
+                this.addShip(this.pointBuffer.get(bufSize - 1), p);
+                if (isPlayerDoneWithSetup(getCurrentPlayer())) {
+                    if (isSetupPhaseDone()) {
+                        endPhase();
+                    } else {
+                        endTurn();
+                    }
+                }
+            }
+            this.pointBuffer.add(p);
+
+        } else if (this.getPhase().equals("playing")) {
+            // does nothing in this version of Game - check TwoPlayerGame where it is implicit which player to attack
+            this.pointBuffer.add(p);
+            endTurn();
+        }
+        // and do nothing if game phase is something else
     }
 
     /**
@@ -146,28 +175,6 @@ public class Game {
         for (GameListener g : this.listeners) {
             g.onChange();
         }
-    }
-
-    /**
-     * Knowing the current player and game phase, only certain things can happen, so given a point we can process
-     * an entire step of the game being played (or half a step if in setup). This modifies the game state -
-     * phase and current Player
-     * @param p a point to process
-     */
-    public void processTurn(Point p) {
-        if (this.getPhase().equals("setup")) {
-            int bufSize = this.pointBuffer.size();
-            if (bufSize % 2 == 1) {
-                this.addShip(this.pointBuffer.get(bufSize - 1), p);
-            }
-            this.pointBuffer.add(p);
-            // TODO: check if this completes the setup phase or not
-        } else if (this.getPhase().equals("playing")) {
-            // does nothing in this version of Game - check TwoPlayerGame where it is implicit which player to attack
-            this.pointBuffer.add(p);
-            endTurn();
-        }
-        // and do nothing if game phase is something else
     }
 
     /**
@@ -317,6 +324,33 @@ public class Game {
             if (shipCount < 0) throw new RuntimeException("Encountered bad ships on Player " + pid);
         }
         return shipsLeft;
+    }
+
+    /**
+     * checks if a player has set up all their ships or not
+     * @param pid the PID of the player to check for
+     * @return a boolean indicating if the player is done or not
+     */
+    private boolean isPlayerDoneWithSetup(int pid) {
+        for (int i: getShipsToBePlaced(pid)) {
+            if (i > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * checks to see if the setup phase is done; all players have set up all their ships
+     * @return a boolean indicating if the setup phase has finished or not
+     */
+    private boolean isSetupPhaseDone() {
+        for (int pid: this.PlayerIdList) {
+            if (!isPlayerDoneWithSetup(pid)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
