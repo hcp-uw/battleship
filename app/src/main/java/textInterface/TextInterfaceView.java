@@ -54,7 +54,7 @@ public class TextInterfaceView implements View {
     public void startMenu() {
         System.out.println("Welcome to Battleship");
         System.out.print("Would you like to play against the computer or "
-                           + "or against another player? ");
+                         + "or against another player? ");
     }
 
     @Override
@@ -88,7 +88,12 @@ public class TextInterfaceView implements View {
     }
 
     @Override
-    public void showErrorUnknownCommand() {
+    public void placingShipLength(int length) {
+        System.out.print("Where to place ship of length " + length + ": ");
+    }
+
+    @Override
+    public void showErrorUnknownInput() {
         System.out.println("Unknown option");
     }
 
