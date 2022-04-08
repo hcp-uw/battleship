@@ -19,11 +19,11 @@ public class Game {
     // 3 phases of game
     private static final String[] GAME_PHASES = {"setup", "playing", "end"};
 
-    protected int gameBoardSize;
-    protected int currentGamePhase;
-    protected Map<Integer, Player> players;
-    protected List<Integer> PlayerIdList;
-    protected int currentPlayer; // current player represented by index in PID list
+    private int gameBoardSize;
+    private int currentGamePhase;
+    private Map<Integer, Player> players;
+    private List<Integer> PlayerIdList;
+    private int currentPlayer; // current player represented by index in PID list
     private List<GameListener> listeners;
     private final int[] allowableShipSet;
     private final Map<Integer, String> playerNames; // this might be refactorable to the Player class
@@ -272,6 +272,7 @@ public class Game {
     /**
      * Gets the Player ID (PID) of the player whose turn is next, the player whose input
      * should take the next turn
+     * TODO: ensure that if the game state is "end" this returns the winner
      * @return the integer PID of the current player to go
      */
     public int getCurrentPlayer() {
@@ -316,6 +317,14 @@ public class Game {
             if (shipCount < 0) throw new RuntimeException("Encountered bad ships on Player " + pid);
         }
         return shipsLeft;
+    }
+
+    /**
+     * get a preview of the next player to go
+     * @return the integer PID of the next player to go
+     */
+    public int getNextPlayer() {
+        return this.PlayerIdList.get((this.currentPlayer + 1) % this.PlayerIdList.size());
     }
 
     /**
