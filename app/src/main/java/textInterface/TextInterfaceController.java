@@ -3,6 +3,7 @@ package textInterface;
 import battleship.Point;
 
 import battleship.Game;
+import battleship.TwoPlayerGame;
 
 public class TextInterfaceController implements InputHandler{
 
@@ -16,12 +17,12 @@ public class TextInterfaceController implements InputHandler{
     /**
      * The data-carrier and processor for the application.
      */
-    private Game game;
+    private final TwoPlayerGame game;
 
     /**
      * The user-facing view and input receiver for this application.
      */
-    private TextInterfaceView view;
+    private final TextInterfaceView view;
 
     /**
      * Temporary data storing the pivot point of the ship to be placed
@@ -34,9 +35,9 @@ public class TextInterfaceController implements InputHandler{
      * classes to manage.
      *
      * @param game A model to use for computation and data.
-     * @param view  A view to use to display data to the user.
+     * @param view  git A view to use to display data to the user.
      */
-    public TextInterfaceController(Game game, TextInterfaceView view){
+    public TextInterfaceController(TwoPlayerGame game, TextInterfaceView view){
         this.game = game;
         this.view = view;
     }
@@ -51,8 +52,8 @@ public class TextInterfaceController implements InputHandler{
      * thread to the provided {@link TextInterfaceView}.
      */
     public void start() {
-        // TODO: decide what is returned by game.getShipsToBePlaced(int pid)
-        view.placeShipPrompt(game.getShipsToBePlaced(game.getCurrentPlayer()).get(0));
+        view.placeShipPrompt();
+        view.placingShipLength((game.getShipsToBePlaced(game.getCurrentPlayer()))[0]);
         view.begin();
     }
 
@@ -90,7 +91,7 @@ public class TextInterfaceController implements InputHandler{
         // check validity
         if (p == null && (input.length() < 2 || checkInvalidPoint(input))) {
             view.showErrorUnknownInput();
-            view.placeShipPrompt(game.getShipsToBePlaced(game.getCurrentPlayer()).get(0));
+            view.placingShipLength(game.getShipsToBePlaced(game.getCurrentPlayer())[0]);
             return;
         } else if (p != null && checkInvalidOrientation(input)){
             view.showErrorUnknownInput();
@@ -101,10 +102,11 @@ public class TextInterfaceController implements InputHandler{
         // deal with input
         if (p == null){
             p = new Point(input.charAt(0) - 'A', input.charAt(1) - '0');
+            game.processTurn(p);
             view.shipOrientationPrompt();
         } else {
             char orientation = input.toLowerCase().charAt(0);
-            boolean valid = game.addShip(p, calculateSecond(orientation,game.getShipsToBePlaced(game.getCurrentPlayer()).get(0));
+            boolean valid = game.processTurn(calculateSecond(orientation,game.getShipsToBePlaced(game.getCurrentPlayer())[0]));
 
             // Note that p is not saved because if the Point is on a ship, both point and orientation need to be rechosen,
             // not just the orientation
@@ -115,9 +117,10 @@ public class TextInterfaceController implements InputHandler{
 
             // check phase
             if (game.getPhase().equals("setup")){
-                view.placeShipPrompt(game.getShipsToBePlaced(game.getCurrentPlayer()).get(0));
+                view.placingShipLength(game.getShipsToBePlaced(game.getCurrentPlayer())[0]);
             } else {
-                view.attackPrompt(game.getCurrentPlayer());
+                view.playerPrompt(game.getCurrentPlayerName());
+                view.attackPrompt();
             }
         }
     }
@@ -128,18 +131,22 @@ public class TextInterfaceController implements InputHandler{
     private void doInputAttack(String input){
         if (input.length() < 2 || checkInvalidPoint(input)){
             view.showErrorUnknownInput();
-            view.attackPrompt(game.getCurrentPlayer());
+            view.playerPrompt(game.getCurrentPlayerName());
+            view.attackPrompt();
         }
         Point temp = new Point(input.toUpperCase().charAt(0), input.charAt(1));
 
-        // TODO: discuss how to get attacked player (only for 2p) - possibly overload method
-        game.attack(temp, );
+        // attack, and if invalid, display error
+        if (!game.processTurn(p)){
+            view.showErrorInvalidPosition();
+        }
 
         // read current phase
         if (game.getPhase().equals("attack")){
-            view.attackPrompt(game.getCurrentPlayer());
+            view.playerPrompt(game.getCurrentPlayerName());
+            view.attackPrompt();
         } else {
-            view.showWinner(game.getCurrentPlayer());
+            view.showWinner(game.getCurrentPlayerName());
             view.exit();
         }
     }
