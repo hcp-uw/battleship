@@ -22,8 +22,8 @@ public class Game {
     private final int gameBoardSize;
     private int currentGamePhase;
     private final Map<Integer, Player> players;
-    private final List<Integer> PlayerIdList; // a list containing PIDs
-    private int currentPlayer; // current player represented by index in PID list
+    private final List<Integer> playerIdList; // a list containing PIDs
+    private int currentPlayerIndex; // current player represented by index in PID list
     private List<GameListener> listeners;
     private final int[] allowableShipSet;
     private final Map<Integer, String> playerNames; // this might be refactorable to the Player class
@@ -50,10 +50,10 @@ public class Game {
         this.gameBoardSize = boardSize;
 
         this.currentGamePhase = 0;
-        this.currentPlayer = 0;
+        this.currentPlayerIndex = 0;
 
-        this.PlayerIdList = new ArrayList<>();
-        this.players.keySet().iterator().forEachRemaining(this.PlayerIdList::add);
+        this.playerIdList = new ArrayList<>();
+        this.players.keySet().iterator().forEachRemaining(this.playerIdList::add);
         this.allowableShipSet = shipsInfo;
 
         this.pointBuffer = new ArrayList<>();
@@ -214,13 +214,13 @@ public class Game {
         if (!this.getPhase().equals("setup")) throw new RuntimeException("Ships may only be added during setup");
 
         Ship toAdd = new Ship(p1, p2);
-        List<Ship> playerCurShips = this.players.get(this.currentPlayer).getShips();
+        List<Ship> playerCurShips = this.players.get(this.getCurrentPlayer()).getShips();
         for (Ship s : playerCurShips) {
             if (shipsIntersect(toAdd, s)) {
                 return false;
             }
         }
-        this.players.get(this.currentPlayer).addShip(toAdd);
+        this.players.get(this.currentPlayerIndex).addShip(toAdd);
         return true;
     }
 
@@ -285,7 +285,7 @@ public class Game {
      * @return the integer PID of the current player to go
      */
     public int getCurrentPlayer() {
-        return this.PlayerIdList.get(this.currentPlayer);
+        return this.playerIdList.get(this.currentPlayerIndex);
     }
 
     /**
@@ -349,7 +349,7 @@ public class Game {
      * @return a boolean indicating if the setup phase has finished or not
      */
     public boolean isSetupPhaseDone() {
-        for (int pid: this.PlayerIdList) {
+        for (int pid: this.playerIdList) {
             if (!isPlayerDoneWithSetup(pid)) {
                 return false;
             }
@@ -362,7 +362,7 @@ public class Game {
      * @return the integer PID of the next player to go
      */
     public int getNextPlayer() {
-        return this.PlayerIdList.get((this.currentPlayer + 1) % this.PlayerIdList.size());
+        return this.playerIdList.get((this.currentPlayerIndex + 1) % this.playerIdList.size());
     }
 
     /**
@@ -370,7 +370,7 @@ public class Game {
      */
     public void endTurn() {
         // loop around the players
-        this.currentPlayer = (this.currentPlayer + 1) % this.PlayerIdList.size();
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerIdList.size();
     }
 
     /**
@@ -385,7 +385,7 @@ public class Game {
      * @param winnerPid the PID of the winning player
      */
     private void endGame(int winnerPid) {
-        this.currentPlayer = winnerPid;
+        this.currentPlayerIndex = winnerPid;
         this.currentGamePhase = 3;
     }
 
