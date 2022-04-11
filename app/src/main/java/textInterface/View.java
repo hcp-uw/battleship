@@ -1,6 +1,9 @@
 package textInterface;
 
 import battleship.BoardView;
+import battleship.Ship;
+
+import java.util.List;
 
 /**
  * The View interface represents a
@@ -34,6 +37,8 @@ public interface View {
     void startMenu();
 
     void drawBoard(BoardView board);
+
+    void drawBoard(BoardView board, List<Ship> ships);
 
     /**
      * Displays a prompt to th
