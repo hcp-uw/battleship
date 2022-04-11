@@ -74,4 +74,8 @@ public class BoardView{
         checkRep();
         return b.toString();
     }
+
+    public int size() {
+        return b.size();
+    }
 }
