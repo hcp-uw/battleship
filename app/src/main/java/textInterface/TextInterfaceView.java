@@ -34,7 +34,7 @@ public class TextInterfaceView implements View {
                                             + "to user input");
         }
         while (active) {
-            inputHandler.handleInput(nextInput());
+            inputHandler.handleInput(nextInput().trim());
         }
     }
 
@@ -67,6 +67,10 @@ public class TextInterfaceView implements View {
         // TODO
     }
 
+    public void playerPrompt(String player){
+        System.out.println(player + "'s turn:");
+    }
+
     @Override
     public void attackPrompt() {
         System.out.print("Position to attack: ");
@@ -90,6 +94,10 @@ public class TextInterfaceView implements View {
     @Override
     public void placingShipLength(int length) {
         System.out.print("Where to place ship of length " + length + ": ");
+    }
+
+    public void showWinner(String player){
+        System.out.println(player + " wins!");
     }
 
     @Override

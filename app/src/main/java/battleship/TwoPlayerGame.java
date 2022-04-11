@@ -30,17 +30,19 @@ public class TwoPlayerGame extends Game {
     }
 
     @Override
-    public void processTurn(Point p) {
+    public boolean processTurn(Point p) {
+        boolean result = false;
         if (this.currentGamePhase == 0) {
             int bufSize = this.pointBuffer.size();
             if (bufSize % 2 == 1) {
-                this.addShip(this.pointBuffer.get(bufSize - 1), p);
+                result = this.addShip(this.pointBuffer.get(bufSize - 1), p);
             }
             this.pointBuffer.add(p);
         } else if (currentGamePhase == 1) {
-            this.attack(p);
+            result = this.attack(p);
             this.pointBuffer.add(p);
         }
+        return result;
         // and do nothing if game phase is something else
     }
 }
