@@ -61,9 +61,9 @@ public interface View {
     void shipLengthPrompt();
 
     /**
-     *
+     * Displays a prompt to the user about placing a ship of the given length
      */
-    void placingShipLength(int length);
+    void placeShipOfLength(int length);
 
     /**
      * Displays an error to the user about an unknown command.
