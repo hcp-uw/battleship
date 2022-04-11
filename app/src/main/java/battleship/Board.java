@@ -155,4 +155,8 @@ public class Board {
         }
         return hits + "\n" + misses;
     }
+
+    public int size() {
+        return size;
+    }
 }

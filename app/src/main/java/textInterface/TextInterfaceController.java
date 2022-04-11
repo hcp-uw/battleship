@@ -53,7 +53,7 @@ public class TextInterfaceController implements InputHandler{
      */
     public void start() {
         view.placeShipPrompt();
-        view.placingShipLength((game.getShipsToBePlaced(game.getCurrentPlayer()))[0]);
+        view.placeShipOfLength((game.getShipsToBePlaced(game.getCurrentPlayer()))[0]);
         view.begin();
     }
 
@@ -91,7 +91,7 @@ public class TextInterfaceController implements InputHandler{
         // check validity
         if (p == null && (input.length() < 2 || checkInvalidPoint(input))) {
             view.showErrorUnknownInput();
-            view.placingShipLength(game.getShipsToBePlaced(game.getCurrentPlayer())[0]);
+            view.placeShipOfLength(game.getShipsToBePlaced(game.getCurrentPlayer())[0]);
             return;
         } else if (p != null && checkInvalidOrientation(input)){
             view.showErrorUnknownInput();
@@ -117,7 +117,7 @@ public class TextInterfaceController implements InputHandler{
 
             // check phase
             if (game.getPhase().equals("setup")){
-                view.placingShipLength(game.getShipsToBePlaced(game.getCurrentPlayer())[0]);
+                view.placeShipOfLength(game.getShipsToBePlaced(game.getCurrentPlayer())[0]);
             } else {
                 view.playerPrompt(game.getCurrentPlayerName());
                 view.attackPrompt();

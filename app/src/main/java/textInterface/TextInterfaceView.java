@@ -1,8 +1,10 @@
 package textInterface;
 
 import battleship.BoardView;
+import battleship.Point;
 
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * The TextInterfaceView class represents a view that allows a user to interact
@@ -59,7 +61,32 @@ public class TextInterfaceView implements View {
 
     @Override
     public void drawBoard(BoardView board) {
-        // TODO
+        int boardSize = 10;
+        StringBuilder builder = new StringBuilder();
+        builder.append(" ");
+        for (char letter = 'A'; letter < 'A' + boardSize; letter++) {
+            builder.append(" ");
+            builder.append(letter);
+        }
+        builder.append("\n");
+        Set<Point> hits = board.getHits();
+        Set<Point> misses = board.getMisses();
+        for (int i = 0; i < boardSize; i++) {
+            builder.append(i);
+            for (int j = 0; j < boardSize; j++) {
+                builder.append(" ");
+                Point p = new Point(i, j);
+                if (hits.contains(p)) {
+                    builder.append("X");
+                } else if (misses.contains(p)) {
+                    builder.append("O");
+                } else {
+                    builder.append("-");
+                }
+            }
+            builder.append("\n");
+        }
+        System.out.print(builder);
     }
 
     @Override
@@ -92,7 +119,7 @@ public class TextInterfaceView implements View {
     }
 
     @Override
-    public void placingShipLength(int length) {
+    public void placeShipOfLength(int length) {
         System.out.print("Where to place ship of length " + length + ": ");
     }
 
