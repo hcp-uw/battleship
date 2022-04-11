@@ -397,6 +397,23 @@ public class Game {
         Point last = this.pointBuffer.get(this.pointBuffer.size() - 1);
         return new Point(last.getX(), last.getY());
     }
+
+    /**
+     * gets a specific player's ships
+     * @param pid the PID of the player whose ships to get
+     * @return a List of Ships that are their ships
+     */
+    public List<Ship> getPlayerShips(int pid) {
+        return this.players.get(pid).getShips();
+    }
+
+    /**
+     * Get the ships of the current player to go, to be used in rendering the view for the current player to go
+     * @return a List of Ships that are contained by the current player
+     */
+    public List<Ship> getCurrentPlayerShips() {
+        return getPlayerShips(getCurrentPlayer());
+    }
 }
 
 interface GameListener {
