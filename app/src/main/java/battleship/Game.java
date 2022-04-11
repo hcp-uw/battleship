@@ -50,7 +50,7 @@ public class Game {
         this.gameBoardSize = boardSize;
 
         this.currentGamePhase = 0;
-        this.currentPlayer = -1;
+        this.currentPlayer = 0;
 
         this.PlayerIdList = new ArrayList<>();
         this.players.keySet().iterator().forEachRemaining(this.PlayerIdList::add);
