@@ -95,11 +95,12 @@ public class Game {
      * phase and current Player
      * @param p a point to process
      */
-    public void processTurn(Point p) {
+    public boolean processTurn(Point p) {
+        boolean result = false;
         if (this.getPhase().equals("setup")) {
             int bufSize = this.pointBuffer.size(); // TODO: make this work with the point + orientation way of specifying a ship
             if (bufSize % 2 == 1) {
-                this.addShip(this.getLastPoint(), p);
+                result = this.addShip(this.getLastPoint(), p);
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {
                     if (isSetupPhaseDone()) {
                         endPhase();
@@ -115,6 +116,7 @@ public class Game {
             this.pointBuffer.add(p);
             endTurn();
         }
+        return result;
         // and do nothing if game phase is something else
     }
 
