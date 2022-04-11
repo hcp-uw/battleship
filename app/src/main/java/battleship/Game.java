@@ -19,11 +19,11 @@ public class Game {
     // 3 phases of game
     private static final String[] GAME_PHASES = {"setup", "playing", "end"};
 
-    protected int gameBoardSize;
-    protected int currentGamePhase;
-    protected Map<Integer, Player> players;
-    protected List<Integer> PlayerIdList;
-    protected int currentPlayer; // current player represented by index in PID list
+    private final int gameBoardSize;
+    private int currentGamePhase;
+    private final Map<Integer, Player> players;
+    private final List<Integer> PlayerIdList; // a list containing PIDs
+    private int currentPlayer; // current player represented by index in PID list
     private List<GameListener> listeners;
     private final int[] allowableShipSet;
     private final Map<Integer, String> playerNames; // this might be refactorable to the Player class
@@ -53,7 +53,7 @@ public class Game {
         this.currentPlayer = -1;
 
         this.PlayerIdList = new ArrayList<>();
-        this.players.keySet().iterator().forEachRemaining((e) -> this.PlayerIdList.add(e));
+        this.players.keySet().iterator().forEachRemaining(this.PlayerIdList::add);
         this.allowableShipSet = shipsInfo;
 
         this.pointBuffer = new ArrayList<>();
@@ -87,6 +87,37 @@ public class Game {
             int pid = baseId + 1;
             this.players.put(pid, new Player(pid, new Ship[0], boardSize));
         }
+    }
+
+    /**
+     * Knowing the current player and game phase, only certain things can happen, so given a point we can process
+     * an entire step of the game being played (or half a step if in setup). This modifies the game state -
+     * phase and current Player
+     * @param p a point to process
+     */
+    public boolean processTurn(Point p) {
+        boolean result = false;
+        if (this.getPhase().equals("setup")) {
+            int bufSize = this.pointBuffer.size(); // TODO: make this work with the point + orientation way of specifying a ship
+            if (bufSize % 2 == 1) {
+                result = this.addShip(this.getLastPoint(), p);
+                if (isPlayerDoneWithSetup(getCurrentPlayer())) {
+                    if (isSetupPhaseDone()) {
+                        endPhase();
+                    } else {
+                        endTurn();
+                    }
+                }
+            }
+            this.pointBuffer.add(p);
+
+        } else if (this.getPhase().equals("playing")) {
+            // does nothing in this version of Game - check TwoPlayerGame where it is implicit which player to attack
+            this.pointBuffer.add(p);
+            endTurn();
+        }
+        return result;
+        // and do nothing if game phase is something else
     }
 
     /**
@@ -146,30 +177,6 @@ public class Game {
         for (GameListener g : this.listeners) {
             g.onChange();
         }
-    }
-
-    /**
-     * Knowing the current player and game phase, only certain things can happen, so given a point we can process
-     * an entire step of the game being played (or half a step if in setup). This modifies the game state -
-     * phase and current Player
-     * @param p a point to process
-     */
-    public boolean processTurn(Point p) {
-        boolean result = false;
-        if (this.getPhase().equals("setup")) {
-            int bufSize = this.pointBuffer.size();
-            if (bufSize % 2 == 1) {
-                result = this.addShip(this.pointBuffer.get(bufSize - 1), p);
-            }
-            this.pointBuffer.add(p);
-            // TODO: check if this completes the setup phase or not
-        } else if (this.getPhase().equals("playing")) {
-            // does nothing in this version of Game - check TwoPlayerGame where it is implicit which player to attack
-            this.pointBuffer.add(p);
-            endTurn();
-        }
-        return result;
-        // and do nothing if game phase is something else
     }
 
     /**
@@ -274,6 +281,7 @@ public class Game {
     /**
      * Gets the Player ID (PID) of the player whose turn is next, the player whose input
      * should take the next turn
+     * if the game phase is "end" this returns the winner of the game
      * @return the integer PID of the current player to go
      */
     public int getCurrentPlayer() {
@@ -282,7 +290,7 @@ public class Game {
 
     /**
      * Gets the player to go by the string name that their PID is mapped to in this.playerNames
-     * @return
+     * @return returns the name of the player to go
      */
     public String getCurrentPlayerName() {
         int curPid = getCurrentPlayer();
@@ -321,9 +329,46 @@ public class Game {
     }
 
     /**
+     * checks if a player has set up all their ships or not
+     * @param pid the PID of the player to check for
+     * @return a boolean indicating if the player is done or not
+     */
+    public boolean isPlayerDoneWithSetup(int pid) {
+        for (int i: getShipsToBePlaced(pid)) {
+            if (i > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * checks to see if the setup phase is effectively finished; all players have set up all their ships
+     * does not check what the game's current phase is. If this returns true, the game phase should not be
+     * "setup", or should be set to something else shortly after
+     * @return a boolean indicating if the setup phase has finished or not
+     */
+    public boolean isSetupPhaseDone() {
+        for (int pid: this.PlayerIdList) {
+            if (!isPlayerDoneWithSetup(pid)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * get a preview of the next player to go
+     * @return the integer PID of the next player to go
+     */
+    public int getNextPlayer() {
+        return this.PlayerIdList.get((this.currentPlayer + 1) % this.PlayerIdList.size());
+    }
+
+    /**
      * ends the current player's turn, and sets this.currentPlayer to the next player to go
      */
-    private void endTurn() {
+    public void endTurn() {
         // loop around the players
         this.currentPlayer = (this.currentPlayer + 1) % this.PlayerIdList.size();
     }
@@ -331,8 +376,26 @@ public class Game {
     /**
      * called to end phases
      */
-    private void endPhase() {
+    public void endPhase() {
         if (this.currentGamePhase < GAME_PHASES.length - 1) this.currentGamePhase++;
+    }
+
+    /**
+     * call to end the game
+     * @param winnerPid the PID of the winning player
+     */
+    private void endGame(int winnerPid) {
+        this.currentPlayer = winnerPid;
+        this.currentGamePhase = 3;
+    }
+
+    /**
+     * returns a copy of the last point in the buffer
+     * @return a Point
+     */
+    public Point getLastPoint() {
+        Point last = this.pointBuffer.get(this.pointBuffer.size() - 1);
+        return new Point(last.getX(), last.getY());
     }
 }
 
