@@ -2,7 +2,10 @@ package textInterface;
 
 import battleship.BoardView;
 import battleship.Point;
+import battleship.Ship;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -87,6 +90,63 @@ public class TextInterfaceView implements View {
             builder.append("\n");
         }
         System.out.print(builder);
+    }
+
+    @Override
+    public void drawBoard(BoardView board, List<Ship> ships) {
+        Set<Point> shipPoints = getAllShipPoints(ships);
+        int boardSize = 10;
+        StringBuilder builder = new StringBuilder();
+        builder.append(" ");
+        for (char letter = 'A'; letter < 'A' + boardSize; letter++) {
+            builder.append(" ");
+            builder.append(letter);
+        }
+        builder.append("\n");
+        Set<Point> hits = board.getHits();
+        Set<Point> misses = board.getMisses();
+        for (int i = 0; i < boardSize; i++) {
+            builder.append(i);
+            for (int j = 0; j < boardSize; j++) {
+                builder.append(" ");
+                Point p = new Point(i, j);
+                if (hits.contains(p)) {
+                    builder.append("X");
+                } else if (misses.contains(p)) {
+                    builder.append("O");
+                } else if (shipPoints.contains(p)) {
+                    builder.append("W");
+                } else {
+                    builder.append("-");
+                }
+            }
+            builder.append("\n");
+        }
+        System.out.print(builder);
+    }
+
+    private Set<Point> getAllShipPoints(List<Ship> ships) {
+        Set<Point> points = new HashSet<>();
+        for (Ship ship : ships) {
+            Point start = ship.startPoint();
+            Point end = ship.endPoint();
+            points.add(start);
+            points.add(end);
+            if (start.getX() == end.getX()) {
+                // Vertical orientation
+                int deltaY = end.getY() - start.getY();
+                for (int i = 1; i < deltaY; i++) {
+                    points.add(new Point(start.getX(), start.getY() + i));
+                }
+            } else {
+                // Horizontal orientation
+                int deltaX = end.getX() - start.getX();
+                for (int i = 1; i < deltaX; i++) {
+                    points.add(new Point(start.getX() + i, start.getX()));
+                }
+            }
+        }
+        return points;
     }
 
     @Override
