@@ -35,7 +35,7 @@ public class TextInterfaceController implements InputHandler{
      * classes to manage.
      *
      * @param game A model to use for computation and data.
-     * @param view  git A view to use to display data to the user.
+     * @param view A view to use to display data to the user.
      */
     public TextInterfaceController(TwoPlayerGame game, TextInterfaceView view){
         this.game = game;
