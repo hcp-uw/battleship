@@ -27,7 +27,6 @@ public class Player {
     // playerBoard != null &&
     // opponentBoards != null &&
     // playerShips != null &&
-    // playerShips.length != 0 &&
     // for each ship in playerShips: ship != null &&
 
     private void checkRep() {
@@ -51,7 +50,7 @@ public class Player {
      * @throws IllegalArgumentException if ships is empty or null
      */
     public Player(int id, Ship[] ships, int board_size) {
-        if (ships == null || ships.length == 0) throw new IllegalArgumentException("Player must have ships!");
+        if (ships == null) throw new IllegalArgumentException("Player's ships must exist!");
         this.playerShips = new ArrayList<>();
         this.playerShips.addAll(Arrays.asList(ships));
 
