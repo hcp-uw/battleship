@@ -51,9 +51,10 @@ public class TextInterfaceController implements InputHandler{
      * is being shut down. Calling this method transfers control of the current
      * thread to the provided {@link TextInterfaceView}.
      */
+    @Override
     public void start() {
         view.placeShipPrompt();
-        view.placeShipOfLength((game.getShipsToBePlaced(game.getCurrentPlayer()))[0]);
+        shipPointPrompt();
         view.begin();
     }
 
@@ -91,7 +92,7 @@ public class TextInterfaceController implements InputHandler{
         // check validity
         if (p == null && (input.length() < 2 || checkInvalidPoint(input))) {
             view.showErrorUnknownInput();
-            view.placeShipOfLength(game.getShipsToBePlaced(game.getCurrentPlayer())[0]);
+            view.placeShipOfLength(getShipLength());
             return;
         } else if (p != null && checkInvalidOrientation(input)){
             view.showErrorUnknownInput();
@@ -106,7 +107,8 @@ public class TextInterfaceController implements InputHandler{
             view.shipOrientationPrompt();
         } else {
             char orientation = input.toLowerCase().charAt(0);
-            boolean valid = game.processTurn(calculateSecond(orientation,game.getShipsToBePlaced(game.getCurrentPlayer())[0]));
+            // calculate second point, pass in to processTurn
+            boolean valid = game.processTurn(calculateSecond(orientation,getShipLength()));
 
             // Note that p is not saved because if the Point is on a ship, both point and orientation need to be rechosen,
             // not just the orientation
@@ -117,10 +119,9 @@ public class TextInterfaceController implements InputHandler{
 
             // check phase
             if (game.getPhase().equals("setup")){
-                view.placeShipOfLength(game.getShipsToBePlaced(game.getCurrentPlayer())[0]);
+                shipPointPrompt();
             } else {
-                view.playerPrompt(game.getCurrentPlayerName());
-                view.attackPrompt();
+                attackPrompt();
             }
         }
     }
@@ -131,25 +132,55 @@ public class TextInterfaceController implements InputHandler{
     private void doInputAttack(String input){
         if (input.length() < 2 || checkInvalidPoint(input)){
             view.showErrorUnknownInput();
-            view.playerPrompt(game.getCurrentPlayerName());
-            view.attackPrompt();
+            attackPrompt();
         }
-        Point temp = new Point(input.toUpperCase().charAt(0), input.charAt(1));
 
-        // attack, and if invalid, display error
-        if (!game.processTurn(p)){
+        // attack using the input point, and if invalid, display error
+        if (!game.processTurn(new Point(input.toUpperCase().charAt(0), input.charAt(1)))){
             view.showErrorInvalidPosition();
         }
 
         // read current phase
         if (game.getPhase().equals("playing")){
-            view.playerPrompt(game.getCurrentPlayerName());
-            view.attackPrompt();
+            attackPrompt();
         } else {
             view.showWinner(game.getCurrentPlayerName());
             view.exit();
         }
     }
+
+
+
+    /**
+     * draws board and prompts for first point of ship
+     */
+    private void shipPointPrompt(){
+        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0),game.getCurrentPlayerShips());
+        view.placeShipOfLength(getShipLength());
+    }
+
+    /**
+     * draws player boards for player attack phase and prompts for attack point
+     */
+    private void attackPrompt(){
+        view.playerPrompt(game.getCurrentPlayerName());
+        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0), game.getCurrentPlayerShips());
+        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(1));
+        view.attackPrompt();
+    }
+
+    /**
+     * returns length of ship to be set up
+     */
+    private int getShipLength(){
+        int[] temp = game.getShipsToBePlaced(game.getCurrentPlayer());
+        int index = 0;
+        while (index < temp.length && temp[index] == 0){
+            index++;
+        }
+        return index;
+    }
+
 
     /**
      * private method to check if input point is valid
