@@ -3,12 +3,17 @@
  */
 package battleship;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import textInterface.InputHandler;
+import textInterface.TextInterfaceController;
+import textInterface.TextInterfaceView;
+import textInterface.View;
 
+public class App {
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        TwoPlayerGame game = new TwoPlayerGame(10);
+        TextInterfaceView view = new TextInterfaceView();
+        TextInterfaceController controller = new TextInterfaceController(game, view);
+        view.setInputHandler(controller);
+        controller.start();
     }
 }
