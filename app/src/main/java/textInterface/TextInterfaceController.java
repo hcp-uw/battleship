@@ -75,7 +75,7 @@ public class TextInterfaceController implements InputHandler{
                 break;
 
             // phases - attack
-            case "attack":
+            case "playing":
                 doInputAttack(input);
                 break;
 
@@ -142,7 +142,7 @@ public class TextInterfaceController implements InputHandler{
         }
 
         // read current phase
-        if (game.getPhase().equals("attack")){
+        if (game.getPhase().equals("playing")){
             view.playerPrompt(game.getCurrentPlayerName());
             view.attackPrompt();
         } else {
