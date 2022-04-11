@@ -29,11 +29,12 @@ public class TwoPlayerGame extends Game {
     }
 
     @Override
-    public void processTurn(Point p) {
+    public boolean processTurn(Point p) {
+        boolean result = false;
         if (getPhase().equals("setup")) {
             int bufSize = super.pointBuffer.size();
             if (bufSize % 2 == 1) {
-                super.addShip(this.getLastPoint(), p);
+                result = super.addShip(this.getLastPoint(), p);
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {
                     if (isSetupPhaseDone()) {
                         endPhase();
@@ -44,9 +45,10 @@ public class TwoPlayerGame extends Game {
             }
             super.pointBuffer.add(p);
         } else if (getPhase().equals("playing")) {
-            this.attack(p);
+            result = this.attack(p);
             super.pointBuffer.add(p);
         }
+        return result;
         // and do nothing if game phase is something else
     }
 }
