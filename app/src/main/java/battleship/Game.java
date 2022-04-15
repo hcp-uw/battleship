@@ -50,7 +50,7 @@ public class Game {
         this.gameBoardSize = boardSize;
 
         this.currentGamePhase = 0;
-        this.currentPlayerIndex = 1;
+        this.currentPlayerIndex = 0;
 
         this.playerIdList = new ArrayList<>();
         this.players.keySet().iterator().forEachRemaining(this.playerIdList::add);
@@ -220,7 +220,7 @@ public class Game {
                 return false;
             }
         }
-        this.players.get(this.currentPlayerIndex).addShip(toAdd);
+        this.players.get(this.getCurrentPlayer()).addShip(toAdd);
         return true;
     }
 
