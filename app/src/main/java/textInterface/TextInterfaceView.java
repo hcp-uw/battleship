@@ -64,37 +64,16 @@ public class TextInterfaceView implements View {
 
     @Override
     public void drawBoard(BoardView board) {
-        int boardSize = 10;
-        StringBuilder builder = new StringBuilder();
-        builder.append(" ");
-        for (char letter = 'A'; letter < 'A' + boardSize; letter++) {
-            builder.append(" ");
-            builder.append(letter);
-        }
-        builder.append("\n");
-        Set<Point> hits = board.getHits();
-        Set<Point> misses = board.getMisses();
-        for (int i = 0; i < boardSize; i++) {
-            builder.append(i);
-            for (int j = 0; j < boardSize; j++) {
-                builder.append(" ");
-                Point p = new Point(i, j);
-                if (hits.contains(p)) {
-                    builder.append("X");
-                } else if (misses.contains(p)) {
-                    builder.append("O");
-                } else {
-                    builder.append("-");
-                }
-            }
-            builder.append("\n");
-        }
-        System.out.print(builder);
+        drawBoard(board, (Set<Point>) null);
     }
 
     @Override
     public void drawBoard(BoardView board, List<Ship> ships) {
         Set<Point> shipPoints = getAllShipPoints(ships);
+        drawBoard(board, shipPoints);
+    }
+
+    private void drawBoard(BoardView board, Set<Point> shipPoints) {
         int boardSize = 10;
         StringBuilder builder = new StringBuilder();
         builder.append(" ");
@@ -114,7 +93,7 @@ public class TextInterfaceView implements View {
                     builder.append("X");
                 } else if (misses.contains(p)) {
                     builder.append("O");
-                } else if (shipPoints.contains(p)) {
+                } else if (shipPoints != null && shipPoints.contains(p)) {
                     builder.append("W");
                 } else {
                     builder.append("-");
@@ -165,7 +144,7 @@ public class TextInterfaceView implements View {
 
     @Override
     public void placeShipPrompt() {
-        System.out.print("Ship placement on board: ");
+        System.out.println("Ship placement on board: ");
     }
 
     @Override
