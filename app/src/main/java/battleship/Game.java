@@ -256,7 +256,7 @@ public class Game {
         } else { // ship must be horizontal
             int dir = (dx < 0) ? -1 : 1;
             for (int i = 0; i <= Math.abs(dx); i++) {
-                out.add(new Point(p2.getY(), x1 + i*dir));
+                out.add(new Point(x1 + i*dir, p2.getY() ));
             }
         }
         return out;
