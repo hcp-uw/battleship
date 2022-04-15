@@ -213,13 +213,13 @@ public class TextInterfaceController implements InputHandler{
         length = length - 1;
         int x = p.getX();
         int y = p.getY();
-        if (orientation == ORIENTATIONS[0]) {
+        if (orientation == ORIENTATIONS[0]) { // u
             y -= length;
-        } else if (orientation == ORIENTATIONS[1]){
+        } else if (orientation == ORIENTATIONS[1]){ // d
             y += length;
-        } else if (orientation == ORIENTATIONS[2]){
+        } else if (orientation == ORIENTATIONS[2]){ // l
             x -= length;
-        } else if (orientation == ORIENTATIONS[3]) {
+        } else if (orientation == ORIENTATIONS[3]) { // r
             x += length;
         }
         return new Point(x, y);
