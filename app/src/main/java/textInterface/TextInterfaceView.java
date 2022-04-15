@@ -88,7 +88,7 @@ public class TextInterfaceView implements View {
             builder.append(i);
             for (int j = 0; j < boardSize; j++) {
                 builder.append(" ");
-                Point p = new Point(i, j);
+                Point p = new Point(j, i);
                 if (hits.contains(p)) {
                     builder.append("X");
                 } else if (misses.contains(p)) {
