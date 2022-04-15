@@ -121,7 +121,7 @@ public class TextInterfaceView implements View {
                 // Horizontal orientation
                 int deltaX = end.getX() - start.getX();
                 for (int i = 1; i < deltaX; i++) {
-                    points.add(new Point(start.getX() + i, start.getX()));
+                    points.add(new Point(start.getX() + i, start.getY()));
                 }
             }
         }
