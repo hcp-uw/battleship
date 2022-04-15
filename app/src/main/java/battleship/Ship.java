@@ -149,7 +149,8 @@ public class Ship {
      */
     private boolean containsPoint(Point p) {
         checkRep();
-        return p.getX() == startPoint.getX()
+        return startPoint.getX() == endPoint.getX()
+                    && p.getX() == startPoint.getX()
                     && p.getY() >= startPoint.getY()
                     && p.getY() <= endPoint.getY()
                 || p.getY() == startPoint.getY()
