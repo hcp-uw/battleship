@@ -91,7 +91,7 @@ public class Player {
     public void attack(Player other, Point p) {
         if (other == null || p == null) throw new IllegalArgumentException("Null inputs to attack");
         checkRep();
-        // this means that player only knows about opponents after attacking them...
+        // TODO: this means that player only knows about opponents after attacking them...
         if (!this.opponentBoards.containsKey(other)) this.opponentBoards.put(other, new Board(BOARD_SIZE));
 
         boolean result = other.receive(p);
