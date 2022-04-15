@@ -84,7 +84,7 @@ public class Game {
     private void generatePlayers(int count, int boardSize) {
         int baseId = 1;
         for (int i = 0; i < count; i++) {
-            int pid = baseId + 1;
+            int pid = baseId + i;
             this.players.put(pid, new Player(pid, new Ship[0], boardSize));
         }
     }
