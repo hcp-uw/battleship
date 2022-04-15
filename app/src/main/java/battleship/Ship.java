@@ -98,7 +98,7 @@ public class Ship {
      */
     public int length() {
         checkRep();
-        return endPoint.getX() - startPoint.getX() + endPoint.getY() - startPoint.getY();
+        return endPoint.getX() - startPoint.getX() + endPoint.getY() - startPoint.getY() + 1;
     }
 
     /**
