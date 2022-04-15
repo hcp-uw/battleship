@@ -5,6 +5,8 @@ import battleship.Point;
 import battleship.Game;
 import battleship.TwoPlayerGame;
 
+import java.util.Locale;
+
 public class TextInterfaceController implements InputHandler{
 
     // This class does not represent an ADT
@@ -102,7 +104,7 @@ public class TextInterfaceController implements InputHandler{
 
         // deal with input
         if (p == null){
-            p = new Point(input.charAt(0) - 'A', input.charAt(1) - '0');
+            p = new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0');
             game.processTurn(p);
             view.shipOrientationPrompt();
         } else {
@@ -208,6 +210,7 @@ public class TextInterfaceController implements InputHandler{
      * private method to calculate second point
      */
     private Point calculateSecond(char orientation, int length){
+        length = length - 1;
         int x = p.getX();
         int y = p.getY();
         if (orientation == ORIENTATIONS[0]) {
