@@ -50,6 +50,7 @@ public class TwoPlayerGame extends Game {
             if (super.playerLost(getNextPlayer())){
                 super.endPhase();
             }
+            endTurn();
         }
         return result;
         // and do nothing if game phase is something else
