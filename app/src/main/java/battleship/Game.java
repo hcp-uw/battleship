@@ -220,7 +220,17 @@ public class Game {
                 return false;
             }
         }
+        if (!shipInBounds(toAdd, this.gameBoardSize)) return false;
         this.players.get(this.getCurrentPlayer()).addShip(toAdd);
+        return true;
+    }
+
+    private boolean shipInBounds(Ship s, int boardSize) {
+        List<Point> shipPoints = getPointsBetween(s.startPoint(), s.endPoint());
+        for (Point p : shipPoints) {
+            if (p.getX() < 0 || p.getX() > boardSize - 1) return false;
+            if (p.getY() < 0 || p.getY() > boardSize - 1) return false;
+        }
         return true;
     }
 
