@@ -47,6 +47,9 @@ public class TwoPlayerGame extends Game {
         } else if (getPhase().equals("playing")) {
             result = this.attack(p);
             super.pointBuffer.add(p);
+            if (super.playerLost(getNextPlayer())){
+                super.endPhase();
+            }
         }
         return result;
         // and do nothing if game phase is something else
