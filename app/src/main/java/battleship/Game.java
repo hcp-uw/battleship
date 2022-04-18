@@ -13,7 +13,7 @@ import java.util.*;
 public class Game {
 
     // represents ships of lengths [2, 3, 3, 4, 5]
-    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 2, 1, 1};
+    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 0, 0, 0};
     // default board size is 10x10
     private static final int DEFAULT_SIZE = 10;
     // 3 phases of game
@@ -187,11 +187,11 @@ public class Game {
      */
     public List<BoardView> getPlayerView(int pid) {
         Player p = this.players.get(pid);
-        List<BoardView> out = p.getEnemyBoards();
-        out.add(0, p.getBoard());
-        if (out.size() != this.playerIdList.size()) {
-            while (out.size() < this.playerIdList.size()) {
-                out.add(new BoardView(new Board(this.gameBoardSize)));
+        List<BoardView> out = new ArrayList<>();
+        out.add(p.getBoard());
+        for (int otherPid : this.playerIdList) {
+            if (otherPid != pid) {
+                out.add(this.players.get(otherPid).getBoard());
             }
         }
         return out;
