@@ -98,7 +98,7 @@ public class Game {
     public boolean processTurn(Point p) {
         boolean result = false;
         if (this.getPhase().equals("setup")) {
-            int bufSize = this.pointBuffer.size(); // TODO: make this work with the point + orientation way of specifying a ship
+            int bufSize = this.pointBuffer.size();
             if (bufSize % 2 == 1) {
                 result = this.addShip(this.getLastPoint(), p);
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {

@@ -85,8 +85,7 @@ public class Player {
      * This player attacks another player and updates this player's board with the result.
      * @param other the other Player to target an attack on
      * @param p the point on the other Player's board to attack
-     * @throws IllegalArgumentException if any args are null
-     * @return a boolean indicating whether this attack was valid (targeted a cell that wasn't attacked before)
+     * @throws IllegalArgumentException if any args are null or if attacking position already attacked
      */
     public void attack(Player other, Point p) {
         if (other == null || p == null) throw new IllegalArgumentException("Null inputs to attack");
