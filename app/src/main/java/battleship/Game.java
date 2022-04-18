@@ -429,6 +429,13 @@ public class Game {
     public List<Ship> getCurrentPlayerShips() {
         return getPlayerShips(getCurrentPlayer());
     }
+
+    /**
+     * returns if the specified player has lost
+     * @param pid the PID of the player whose ship to get
+     * @return true if the given player has lost
+     */
+    public boolean playerLost(int pid){ return this.players.get(pid).hasLost(); }
 }
 
 interface GameListener {

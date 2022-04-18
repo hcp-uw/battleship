@@ -151,6 +151,19 @@ public class Player {
         return new ArrayList<>(this.playerShips);
     }
 
+    /**
+     * Returns if all of the player's ships have sunk
+     * @return true if the player has lost
+     */
+    public boolean hasLost(){
+        for (Ship s: this.playerShips){
+            if (!s.isSunk()){
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof Player)) {
