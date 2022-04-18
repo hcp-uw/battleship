@@ -4,9 +4,12 @@ import battleship.BoardView;
 import battleship.Point;
 import battleship.Ship;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -18,13 +21,13 @@ public class TextInterfaceView implements View {
     // This class does not represent an ADT
 
     private InputHandler inputHandler;
-    private Scanner input;
+    private BufferedReader input;
 
     private boolean active;
 
     public TextInterfaceView() {
         active = true;
-        input = new Scanner(System.in);
+        input = new BufferedReader(new InputStreamReader(System.in));
     }
 
     @Override
@@ -44,15 +47,27 @@ public class TextInterfaceView implements View {
     }
 
     private String nextInput() {
-        String nextInput = input.nextLine();
-        System.out.println();
-        return nextInput;
+        String inputValue = null;
+        while (inputValue == null) {
+            try {
+                if (input.ready()) {
+                    inputValue = input.readLine();
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+        return inputValue;
     }
 
     @Override
     public void exit() {
         active = false;
-        input.close();
+        try {
+            input.close();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     @Override
