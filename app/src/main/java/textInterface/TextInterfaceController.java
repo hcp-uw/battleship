@@ -169,7 +169,8 @@ public class TextInterfaceController implements InputHandler{
     private void attackPrompt(){
         view.playerPrompt(game.getCurrentPlayerName());
         List<BoardView> boards = game.getPlayerView(game.getCurrentPlayer());
-        for (int i = 0; i < boards.size(); i++){
+        view.drawBoard(boards.get(0), game.getPlayerShips(game.getCurrentPlayer()));
+        for (int i = 1; i < boards.size(); i++){
             view.drawBoard(boards.get(i));
         }
         view.attackPrompt();
