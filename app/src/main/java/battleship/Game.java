@@ -189,6 +189,11 @@ public class Game {
         Player p = this.players.get(pid);
         List<BoardView> out = p.getEnemyBoards();
         out.add(0, p.getBoard());
+        if (out.size() != this.playerIdList.size()) {
+            while (out.size() < this.playerIdList.size()) {
+                out.add(new BoardView(new Board(this.gameBoardSize)));
+            }
+        }
         return out;
     }
 
