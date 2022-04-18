@@ -1,10 +1,12 @@
 package textInterface;
 
+import battleship.BoardView;
 import battleship.Point;
 
 import battleship.Game;
 import battleship.TwoPlayerGame;
 
+import java.util.List;
 import java.util.Locale;
 
 public class TextInterfaceController implements InputHandler{
@@ -138,7 +140,7 @@ public class TextInterfaceController implements InputHandler{
         }
 
         // attack using the input point, and if invalid, display error
-        if (!game.processTurn(new Point(input.toUpperCase().charAt(0), input.charAt(1)))){
+        if (!game.processTurn(new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0'))){
             view.showErrorInvalidPosition();
         }
 
@@ -166,8 +168,10 @@ public class TextInterfaceController implements InputHandler{
      */
     private void attackPrompt(){
         view.playerPrompt(game.getCurrentPlayerName());
-        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0), game.getCurrentPlayerShips());
-        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(1));
+        List<BoardView> boards = game.getPlayerView(game.getCurrentPlayer());
+        for (int i = 0; i < boards.size(); i++){
+            view.drawBoard(boards.get(i));
+        }
         view.attackPrompt();
     }
 
