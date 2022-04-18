@@ -68,6 +68,7 @@ public class Ship {
         } else {
             throw new IllegalArgumentException("start and end point must span a vertical or horizontal line segment");
         }
+        hp = length();
         checkRep();
     }
 
