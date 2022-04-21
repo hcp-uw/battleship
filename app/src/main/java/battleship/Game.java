@@ -221,16 +221,12 @@ public class Game {
         if (!this.getPhase().equals("setup")) throw new RuntimeException("Ships may only be added during setup");
 
         Ship toAdd = new Ship(p1, p2);
-//        List<Ship> playerCurShips = this.players.get(this.getCurrentPlayer()).getShips();
         Set<Point> playerShipPoints = this.players.get(this.getCurrentPlayer()).getShipPoints();
         List<Point> toAddPoints = PointUtils.getPointsBetween(p1, p2);
         for (Point p : toAddPoints) {
             if (playerShipPoints.contains(p)) {
                 return false;
             }
-//            if (shipsIntersect(toAdd, s)) {
-//                return false;
-//            }
         }
         if (!shipInBounds(toAdd, this.gameBoardSize)) return false;
         this.players.get(this.getCurrentPlayer()).addShip(toAdd);
