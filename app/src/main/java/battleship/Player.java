@@ -1,5 +1,7 @@
 package battleship;
 
+import utils.PointUtils;
+
 import java.util.*;
 
 /**
@@ -15,6 +17,7 @@ public class Player {
     private final Board playerBoard;
     private final Map<Player, Board> opponentBoards;
     private final List<Ship> playerShips;
+    private final Set<Point> playerShipPoints;
 
     // Abstraction Function:
     // playerBoard is this player's board with hit and misses on it
@@ -34,6 +37,7 @@ public class Player {
         assert this.opponentBoards != null : "Opponent boards cannot be null";
         assert this.playerShips != null : "Collection of ships cannot be null";
         assert this.playerShips.size() != 0 : "Collection of ships must be non-empty";
+        assert this.playerShipPoints != null : "Ship Points should not be null";
 
         if (DEBUG) {
             for (Ship s : this.playerShips) {
@@ -52,7 +56,11 @@ public class Player {
     public Player(int id, Ship[] ships, int board_size) {
         if (ships == null) throw new IllegalArgumentException("Player's ships must exist!");
         this.playerShips = new ArrayList<>();
-        this.playerShips.addAll(Arrays.asList(ships));
+        this.playerShipPoints = new HashSet<>();
+
+        for (Ship s : ships) {
+            this.addShip(s);
+        }
 
         this.playerBoard = new Board(board_size);
         this.opponentBoards = new HashMap<>();
@@ -79,6 +87,7 @@ public class Player {
      */
     public void addShip(Ship s) {
         this.playerShips.add(s);
+        this.playerShipPoints.addAll(PointUtils.getPointsBetween(s.startPoint(), s.endPoint()));
     }
 
     /**
@@ -149,6 +158,15 @@ public class Player {
         checkRep();
         // CAUTION! not a deep copy so ships can be modified TODO fix this!
         return new ArrayList<>(this.playerShips);
+    }
+
+    /**
+     * getter for the points occupied by this player's ships
+     * returned set and items inside should not be modified
+     * @return a set of points where each point is a point in one of this player's ships
+     */
+    public Set<Point> getShipPoints() {
+        return this.playerShipPoints;
     }
 
     /**

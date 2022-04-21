@@ -88,7 +88,7 @@ public class TextInterfaceView implements View {
         drawBoard(board, shipPoints);
     }
 
-    private void drawBoard(BoardView board, Set<Point> shipPoints) {
+    public void drawBoard(BoardView board, Set<Point> shipPoints) {
         int boardSize = 10;
         StringBuilder builder = new StringBuilder();
         builder.append(" ");
