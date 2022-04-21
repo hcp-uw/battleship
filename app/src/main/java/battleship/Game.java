@@ -432,10 +432,26 @@ public class Game {
 
     /**
      * returns if the specified player has lost
-     * @param pid the PID of the player whose ship to get
+     * @param pid the PID of the player check the loss of
      * @return true if the given player has lost
      */
     public boolean playerLost(int pid){ return this.players.get(pid).hasLost(); }
+
+    /**
+     * returns if the specified player has won
+     * @param pid the pid of the player to check for win
+     * @return true if the given player as won
+     */
+    public boolean playerWon(int pid) {
+        for (int otherPlayer : playerIdList) {
+            if (otherPlayer != pid) {
+                if (!playerLost(otherPlayer)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
 
 interface GameListener {
