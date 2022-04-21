@@ -161,6 +161,7 @@ public class Player {
     }
 
     /**
+<<<<<<< HEAD
      * getter for the points occupied by this player's ships
      * returned set and items inside should not be modified
      * @return a set of points where each point is a point in one of this player's ships
@@ -170,6 +171,8 @@ public class Player {
     }
 
     /**
+=======
+>>>>>>> mvp
      * Returns if all of the player's ships have sunk
      * @return true if the player has lost
      */
