@@ -20,6 +20,11 @@ public class TextInterfaceView implements View {
 
     // This class does not represent an ADT
 
+    private static final String RED = "\u001b[31m";
+    private static final String GREEN = "\u001b[32m";
+    private static final String BLUE = "\u001b[36m";
+    private static final String RESET = "\u001b[0m";
+
     private InputHandler inputHandler;
     private BufferedReader input;
 
@@ -105,11 +110,15 @@ public class TextInterfaceView implements View {
                 builder.append(" ");
                 Point p = new Point(j, i);
                 if (hits.contains(p)) {
+                    builder.append(RED);
                     builder.append("X");
+                    builder.append(RESET);
                 } else if (misses.contains(p)) {
                     builder.append("O");
                 } else if (shipPoints != null && shipPoints.contains(p)) {
+                    builder.append(GREEN);
                     builder.append("W");
+                    builder.append(RESET);
                 } else {
                     builder.append("-");
                 }
@@ -149,45 +158,45 @@ public class TextInterfaceView implements View {
     }
 
     public void playerPrompt(String player){
-        System.out.println(player + "'s turn:");
+        System.out.println(BLUE + player + "'s turn:" + RESET);
     }
 
     @Override
     public void attackPrompt() {
-        System.out.print("Position to attack: ");
+        System.out.print(BLUE + "Position to attack: " + RESET);
     }
 
     @Override
     public void placeShipPrompt() {
-        System.out.println("Ship placement on board: ");
+        System.out.println(BLUE + "Ship placement on board: " + RESET);
     }
 
     @Override
     public void shipOrientationPrompt() {
-        System.out.print("Ship orientation: ");
+        System.out.print(BLUE + "Ship orientation: " + RESET);
     }
 
     @Override
     public void shipLengthPrompt() {
-        System.out.print("Ship length: ");
+        System.out.print(BLUE + "Ship length: " + RESET);
     }
 
     @Override
     public void placeShipOfLength(int length) {
-        System.out.print("Where to place ship of length " + length + ": ");
+        System.out.print(BLUE + "Where to place ship of length " + length + ": " + RESET);
     }
 
     public void showWinner(String player){
-        System.out.println(player + " wins!");
+        System.out.println(BLUE + player + " wins!" + RESET);
     }
 
     @Override
     public void showErrorUnknownInput() {
-        System.out.println("Unknown option");
+        System.out.println(RED + "Unknown option" + RESET);
     }
 
     @Override
     public void showErrorInvalidPosition() {
-        System.out.println("Invalid board position");
+        System.out.println(RED + "Invalid board position" + RESET);
     }
 }
