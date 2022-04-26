@@ -159,7 +159,7 @@ public class TextInterfaceController implements InputHandler{
      * draws board and prompts for first point of ship
      */
     private void shipPointPrompt(){
-        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0),game.getCurrentPlayerShips());
+        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0), game.getCurrentPlayerShipPoints());
         view.placeShipOfLength(getShipLength());
     }
 
@@ -169,7 +169,7 @@ public class TextInterfaceController implements InputHandler{
     private void attackPrompt(){
         view.playerPrompt(game.getCurrentPlayerName());
         List<BoardView> boards = game.getPlayerView(game.getCurrentPlayer());
-        view.drawBoard(boards.get(0), game.getPlayerShips(game.getCurrentPlayer()));
+        view.drawBoard(boards.get(0), game.getCurrentPlayerShipPoints());
         for (int i = 1; i < boards.size(); i++){
             view.drawBoard(boards.get(i));
         }

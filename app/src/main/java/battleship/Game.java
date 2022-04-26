@@ -1,5 +1,7 @@
 package battleship;
 
+import utils.PointUtils;
+
 import java.util.*;
 
 /**
@@ -219,9 +221,10 @@ public class Game {
         if (!this.getPhase().equals("setup")) throw new RuntimeException("Ships may only be added during setup");
 
         Ship toAdd = new Ship(p1, p2);
-        List<Ship> playerCurShips = this.players.get(this.getCurrentPlayer()).getShips();
-        for (Ship s : playerCurShips) {
-            if (shipsIntersect(toAdd, s)) {
+        Set<Point> playerShipPoints = this.players.get(this.getCurrentPlayer()).getShipPoints();
+        List<Point> toAddPoints = PointUtils.getPointsBetween(p1, p2);
+        for (Point p : toAddPoints) {
+            if (playerShipPoints.contains(p)) {
                 return false;
             }
         }
@@ -231,7 +234,7 @@ public class Game {
     }
 
     private boolean shipInBounds(Ship s, int boardSize) {
-        List<Point> shipPoints = getPointsBetween(s.startPoint(), s.endPoint());
+        List<Point> shipPoints = PointUtils.getPointsBetween(s.startPoint(), s.endPoint());
         for (Point p : shipPoints) {
             if (p.getX() < 0 || p.getX() > boardSize - 1) return false;
             if (p.getY() < 0 || p.getY() > boardSize - 1) return false;
@@ -240,8 +243,8 @@ public class Game {
     }
 
     private boolean shipsIntersect(Ship s1, Ship s2) {
-        List<Point> pointsS1 = getPointsBetween(s1.startPoint(), s1.endPoint());
-        List<Point> pointsS2 = getPointsBetween(s2.startPoint(), s2.endPoint());
+        List<Point> pointsS1 = PointUtils.getPointsBetween(s1.startPoint(), s1.endPoint());
+        List<Point> pointsS2 = PointUtils.getPointsBetween(s2.startPoint(), s2.endPoint());
 
         // not an efficient algorithm, shouldn't matter unless ships are large
         // there is definitely a mathematical way to check line intersections TODO look for that
@@ -251,30 +254,6 @@ public class Game {
             }
         }
         return false;
-    }
-
-    // helper to get all points in between two points in a line, vertically or horizontally
-    // inclusively
-    private List<Point> getPointsBetween(Point p1, Point p2) {
-        List<Point> out = new ArrayList<>();
-        int x1 = p1.getX();
-        int x2 = p2.getX();
-        int dx = x2 - x1;
-        if (dx == 0) { // ship is vertical
-            int y1 = p1.getY();
-            int y2 = p2.getY();
-            int dy = y2 - y1;
-            int dir = (dy < 0) ? -1 : 1;
-            for (int i = 0; i <= Math.abs(dy); i++) {
-                out.add(new Point(p2.getX(), y1 + i*dir));
-            }
-        } else { // ship must be horizontal
-            int dir = (dx < 0) ? -1 : 1;
-            for (int i = 0; i <= Math.abs(dx); i++) {
-                out.add(new Point(x1 + i*dir, p2.getY() ));
-            }
-        }
-        return out;
     }
 
     /**
@@ -431,8 +410,17 @@ public class Game {
     }
 
     /**
+     * gets all the points occupied by the ships of the current player
+     * the returned set should not be modified in any way
+     * @return a set of Points
+     */
+    public Set<Point> getCurrentPlayerShipPoints() {
+        return this.players.get(getCurrentPlayer()).getShipPoints();
+    }
+
+    /**
      * returns if the specified player has lost
-     * @param pid the PID of the player check the loss of
+     * @param pid the PID of the player whose ship to get
      * @return true if the given player has lost
      */
     public boolean playerLost(int pid){ return this.players.get(pid).hasLost(); }
