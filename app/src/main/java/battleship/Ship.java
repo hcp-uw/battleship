@@ -68,6 +68,7 @@ public class Ship {
         } else {
             throw new IllegalArgumentException("start and end point must span a vertical or horizontal line segment");
         }
+        hp = length();
         checkRep();
     }
 
@@ -98,7 +99,7 @@ public class Ship {
      */
     public int length() {
         checkRep();
-        return endPoint.getX() - startPoint.getX() + endPoint.getY() - startPoint.getY();
+        return endPoint.getX() - startPoint.getX() + endPoint.getY() - startPoint.getY() + 1;
     }
 
     /**
@@ -149,7 +150,8 @@ public class Ship {
      */
     private boolean containsPoint(Point p) {
         checkRep();
-        return p.getX() == startPoint.getX()
+        return startPoint.getX() == endPoint.getX()
+                    && p.getX() == startPoint.getX()
                     && p.getY() >= startPoint.getY()
                     && p.getY() <= endPoint.getY()
                 || p.getY() == startPoint.getY()

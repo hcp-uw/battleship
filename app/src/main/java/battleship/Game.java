@@ -1,5 +1,7 @@
 package battleship;
 
+import utils.PointUtils;
+
 import java.util.*;
 
 /**
@@ -13,7 +15,7 @@ import java.util.*;
 public class Game {
 
     // represents ships of lengths [2, 3, 3, 4, 5]
-    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 2, 1, 1};
+    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 0, 0, 0};
     // default board size is 10x10
     private static final int DEFAULT_SIZE = 10;
     // 3 phases of game
@@ -50,7 +52,7 @@ public class Game {
         this.gameBoardSize = boardSize;
 
         this.currentGamePhase = 0;
-        this.currentPlayerIndex = 1;
+        this.currentPlayerIndex = 0;
 
         this.playerIdList = new ArrayList<>();
         this.players.keySet().iterator().forEachRemaining(this.playerIdList::add);
@@ -84,7 +86,7 @@ public class Game {
     private void generatePlayers(int count, int boardSize) {
         int baseId = 1;
         for (int i = 0; i < count; i++) {
-            int pid = baseId + 1;
+            int pid = baseId + i;
             this.players.put(pid, new Player(pid, new Ship[0], boardSize));
         }
     }
@@ -98,7 +100,7 @@ public class Game {
     public boolean processTurn(Point p) {
         boolean result = false;
         if (this.getPhase().equals("setup")) {
-            int bufSize = this.pointBuffer.size(); // TODO: make this work with the point + orientation way of specifying a ship
+            int bufSize = this.pointBuffer.size();
             if (bufSize % 2 == 1) {
                 result = this.addShip(this.getLastPoint(), p);
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {
@@ -187,8 +189,13 @@ public class Game {
      */
     public List<BoardView> getPlayerView(int pid) {
         Player p = this.players.get(pid);
-        List<BoardView> out = p.getEnemyBoards();
-        out.add(0, p.getBoard());
+        List<BoardView> out = new ArrayList<>();
+        out.add(p.getBoard());
+        for (int otherPid : this.playerIdList) {
+            if (otherPid != pid) {
+                out.add(this.players.get(otherPid).getBoard());
+            }
+        }
         return out;
     }
 
@@ -214,19 +221,30 @@ public class Game {
         if (!this.getPhase().equals("setup")) throw new RuntimeException("Ships may only be added during setup");
 
         Ship toAdd = new Ship(p1, p2);
-        List<Ship> playerCurShips = this.players.get(this.getCurrentPlayer()).getShips();
-        for (Ship s : playerCurShips) {
-            if (shipsIntersect(toAdd, s)) {
+        Set<Point> playerShipPoints = this.players.get(this.getCurrentPlayer()).getShipPoints();
+        List<Point> toAddPoints = PointUtils.getPointsBetween(p1, p2);
+        for (Point p : toAddPoints) {
+            if (playerShipPoints.contains(p)) {
                 return false;
             }
         }
-        this.players.get(this.currentPlayerIndex).addShip(toAdd);
+        if (!shipInBounds(toAdd, this.gameBoardSize)) return false;
+        this.players.get(this.getCurrentPlayer()).addShip(toAdd);
+        return true;
+    }
+
+    private boolean shipInBounds(Ship s, int boardSize) {
+        List<Point> shipPoints = PointUtils.getPointsBetween(s.startPoint(), s.endPoint());
+        for (Point p : shipPoints) {
+            if (p.getX() < 0 || p.getX() > boardSize - 1) return false;
+            if (p.getY() < 0 || p.getY() > boardSize - 1) return false;
+        }
         return true;
     }
 
     private boolean shipsIntersect(Ship s1, Ship s2) {
-        List<Point> pointsS1 = getPointsBetween(s1.startPoint(), s1.endPoint());
-        List<Point> pointsS2 = getPointsBetween(s2.startPoint(), s2.endPoint());
+        List<Point> pointsS1 = PointUtils.getPointsBetween(s1.startPoint(), s1.endPoint());
+        List<Point> pointsS2 = PointUtils.getPointsBetween(s2.startPoint(), s2.endPoint());
 
         // not an efficient algorithm, shouldn't matter unless ships are large
         // there is definitely a mathematical way to check line intersections TODO look for that
@@ -236,30 +254,6 @@ public class Game {
             }
         }
         return false;
-    }
-
-    // helper to get all points in between two points in a line, vertically or horizontally
-    // inclusively
-    private List<Point> getPointsBetween(Point p1, Point p2) {
-        List<Point> out = new ArrayList<>();
-        int x1 = p1.getX();
-        int x2 = p2.getX();
-        int dx = x2 - x1;
-        if (dx == 0) { // ship is vertical
-            int y1 = p1.getY();
-            int y2 = p2.getY();
-            int dy = y2 - y1;
-            int dir = (dy < 0) ? -1 : 1;
-            for (int i = 0; i <= Math.abs(dy); i++) {
-                out.add(new Point(p2.getX(), y1 + i*dir));
-            }
-        } else { // ship must be horizontal
-            int dir = (dx < 0) ? -1 : 1;
-            for (int i = 0; i <= Math.abs(dx); i++) {
-                out.add(new Point(p2.getX(), x1 + i*dir));
-            }
-        }
-        return out;
     }
 
     /**
@@ -413,6 +407,38 @@ public class Game {
      */
     public List<Ship> getCurrentPlayerShips() {
         return getPlayerShips(getCurrentPlayer());
+    }
+
+    /**
+     * gets all the points occupied by the ships of the current player
+     * the returned set should not be modified in any way
+     * @return a set of Points
+     */
+    public Set<Point> getCurrentPlayerShipPoints() {
+        return this.players.get(getCurrentPlayer()).getShipPoints();
+    }
+
+    /**
+     * returns if the specified player has lost
+     * @param pid the PID of the player whose ship to get
+     * @return true if the given player has lost
+     */
+    public boolean playerLost(int pid){ return this.players.get(pid).hasLost(); }
+
+    /**
+     * returns if the specified player has won
+     * @param pid the pid of the player to check for win
+     * @return true if the given player as won
+     */
+    public boolean playerWon(int pid) {
+        for (int otherPlayer : playerIdList) {
+            if (otherPlayer != pid) {
+                if (!playerLost(otherPlayer)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
 

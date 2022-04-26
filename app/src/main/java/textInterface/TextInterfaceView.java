@@ -4,9 +4,12 @@ import battleship.BoardView;
 import battleship.Point;
 import battleship.Ship;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -18,13 +21,13 @@ public class TextInterfaceView implements View {
     // This class does not represent an ADT
 
     private InputHandler inputHandler;
-    private Scanner input;
+    private BufferedReader input;
 
     private boolean active;
 
     public TextInterfaceView() {
         active = true;
-        input = new Scanner(System.in);
+        input = new BufferedReader(new InputStreamReader(System.in));
     }
 
     @Override
@@ -44,15 +47,27 @@ public class TextInterfaceView implements View {
     }
 
     private String nextInput() {
-        String nextInput = input.nextLine();
-        System.out.println();
-        return nextInput;
+        String inputValue = null;
+        while (inputValue == null) {
+            try {
+                if (input.ready()) {
+                    inputValue = input.readLine();
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+        return inputValue;
     }
 
     @Override
     public void exit() {
         active = false;
-        input.close();
+        try {
+            input.close();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     @Override
@@ -73,7 +88,7 @@ public class TextInterfaceView implements View {
         drawBoard(board, shipPoints);
     }
 
-    private void drawBoard(BoardView board, Set<Point> shipPoints) {
+    public void drawBoard(BoardView board, Set<Point> shipPoints) {
         int boardSize = 10;
         StringBuilder builder = new StringBuilder();
         builder.append(" ");
@@ -88,7 +103,7 @@ public class TextInterfaceView implements View {
             builder.append(i);
             for (int j = 0; j < boardSize; j++) {
                 builder.append(" ");
-                Point p = new Point(i, j);
+                Point p = new Point(j, i);
                 if (hits.contains(p)) {
                     builder.append("X");
                 } else if (misses.contains(p)) {
@@ -121,7 +136,7 @@ public class TextInterfaceView implements View {
                 // Horizontal orientation
                 int deltaX = end.getX() - start.getX();
                 for (int i = 1; i < deltaX; i++) {
-                    points.add(new Point(start.getX() + i, start.getX()));
+                    points.add(new Point(start.getX() + i, start.getY()));
                 }
             }
         }

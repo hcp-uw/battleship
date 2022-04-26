@@ -47,6 +47,11 @@ public class TwoPlayerGame extends Game {
         } else if (getPhase().equals("playing")) {
             result = this.attack(p);
             super.pointBuffer.add(p);
+            if (super.playerLost(getNextPlayer())){
+                super.endPhase(); // don't end the turn if the player has won - keep cur player as winner
+            } else {
+                endTurn();
+            }
         }
         return result;
         // and do nothing if game phase is something else

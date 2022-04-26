@@ -1,9 +1,13 @@
 package textInterface;
 
+import battleship.BoardView;
 import battleship.Point;
 
 import battleship.Game;
 import battleship.TwoPlayerGame;
+
+import java.util.List;
+import java.util.Locale;
 
 public class TextInterfaceController implements InputHandler{
 
@@ -102,7 +106,7 @@ public class TextInterfaceController implements InputHandler{
 
         // deal with input
         if (p == null){
-            p = new Point(input.charAt(0) - 'A', input.charAt(1) - '0');
+            p = new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0');
             game.processTurn(p);
             view.shipOrientationPrompt();
         } else {
@@ -136,7 +140,7 @@ public class TextInterfaceController implements InputHandler{
         }
 
         // attack using the input point, and if invalid, display error
-        if (!game.processTurn(new Point(input.toUpperCase().charAt(0), input.charAt(1)))){
+        if (!game.processTurn(new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0'))){
             view.showErrorInvalidPosition();
         }
 
@@ -155,7 +159,7 @@ public class TextInterfaceController implements InputHandler{
      * draws board and prompts for first point of ship
      */
     private void shipPointPrompt(){
-        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0),game.getCurrentPlayerShips());
+        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0), game.getCurrentPlayerShipPoints());
         view.placeShipOfLength(getShipLength());
     }
 
@@ -164,8 +168,11 @@ public class TextInterfaceController implements InputHandler{
      */
     private void attackPrompt(){
         view.playerPrompt(game.getCurrentPlayerName());
-        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0), game.getCurrentPlayerShips());
-        view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(1));
+        List<BoardView> boards = game.getPlayerView(game.getCurrentPlayer());
+        view.drawBoard(boards.get(0), game.getCurrentPlayerShipPoints());
+        for (int i = 1; i < boards.size(); i++){
+            view.drawBoard(boards.get(i));
+        }
         view.attackPrompt();
     }
 
@@ -208,15 +215,16 @@ public class TextInterfaceController implements InputHandler{
      * private method to calculate second point
      */
     private Point calculateSecond(char orientation, int length){
+        length = length - 1;
         int x = p.getX();
         int y = p.getY();
-        if (orientation == ORIENTATIONS[0]) {
+        if (orientation == ORIENTATIONS[0]) { // u
             y -= length;
-        } else if (orientation == ORIENTATIONS[1]){
+        } else if (orientation == ORIENTATIONS[1]){ // d
             y += length;
-        } else if (orientation == ORIENTATIONS[2]){
+        } else if (orientation == ORIENTATIONS[2]){ // l
             x -= length;
-        } else if (orientation == ORIENTATIONS[3]) {
+        } else if (orientation == ORIENTATIONS[3]) { // r
             x += length;
         }
         return new Point(x, y);
