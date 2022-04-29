@@ -89,6 +89,7 @@ public class Game {
             int pid = baseId + i;
             this.players.put(pid, new Player(pid, new Ship[0], boardSize));
         }
+        this.players.put(2, new ComputerPlayer(2, new Ship[0], boardSize));
     }
 
     /**
@@ -106,9 +107,8 @@ public class Game {
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {
                     if (isSetupPhaseDone()) {
                         endPhase();
-                    } else {
-                        endTurn();
                     }
+                    endTurn();
                 }
             }
             this.pointBuffer.add(p);
@@ -120,6 +120,35 @@ public class Game {
         }
         return result;
         // and do nothing if game phase is something else
+    }
+
+    public void computerProcessTurn() {
+        if (!(this.players.get(this.getCurrentPlayer()) instanceof ComputerPlayer)) {
+            throw new IllegalStateException("Cannot process computer turn for non-computer players");
+        }
+        ComputerPlayer computerPlayer = (ComputerPlayer) this.players.get(this.getCurrentPlayer());
+        if (this.getPhase().equals("setup")) {
+            for (int length = allowableShipSet.length - 1; length >= 0; length--) {
+                int index = allowableShipSet[length];
+                while (index > 0) {
+                    Point[] shipPoints = computerPlayer.generateShip(length);
+                    if (this.addShip(shipPoints[0], shipPoints[1])) {
+                        index--;
+                    }
+                }
+            }
+            if (this.isSetupPhaseDone()) {
+                this.endPhase();
+            }
+            this.endTurn();
+        } else if (this.getPhase().equals("playing")) {
+            while (!this.attack(this.getNextPlayer(), computerPlayer.getAttackPoint())){}
+            if (this.playerLost(this.getNextPlayer())){
+                this.endPhase(); // don't end the turn if the player has won - keep cur player as winner
+            } else {
+                this.endTurn();
+            }
+        }
     }
 
     /**
@@ -365,6 +394,9 @@ public class Game {
     public void endTurn() {
         // loop around the players
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerIdList.size();
+        if (this.players.get(this.getCurrentPlayer()) instanceof ComputerPlayer) {
+            computerProcessTurn();
+        }
     }
 
     /**

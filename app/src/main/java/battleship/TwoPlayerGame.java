@@ -38,9 +38,8 @@ public class TwoPlayerGame extends Game {
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {
                     if (isSetupPhaseDone()) {
                         endPhase();
-                    } else {
-                        endTurn();
                     }
+                    endTurn();
                 }
             }
             super.pointBuffer.add(p);
@@ -49,7 +48,7 @@ public class TwoPlayerGame extends Game {
             super.pointBuffer.add(p);
             if (super.playerLost(getNextPlayer())){
                 super.endPhase(); // don't end the turn if the player has won - keep cur player as winner
-            } else {
+            } else if (result) {
                 endTurn();
             }
         }
