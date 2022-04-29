@@ -25,8 +25,8 @@ public class ComputerPlayer extends Player {
         } else { // vertical
             points[1] = new Point(points[0].getX(), points[0].getY() + (length - 1) * multiplier);
         }
-        return new Point[] {new Point(0, 0), new Point(0, 1)};
-        // return points;
+//        return new Point[] {new Point(0, 0), new Point(0, 1)};
+        return points;
     }
 
     public Point getAttackPoint() {
