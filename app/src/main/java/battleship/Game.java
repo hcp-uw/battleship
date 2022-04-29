@@ -15,7 +15,7 @@ import java.util.*;
 public class Game {
 
     // represents ships of lengths [2, 3, 3, 4, 5]
-    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 0, 0, 0};
+    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 1, 0, 0};
     // default board size is 10x10
     private static final int DEFAULT_SIZE = 10;
     // 3 phases of game

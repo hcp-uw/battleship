@@ -125,6 +125,7 @@ public class TextInterfaceController implements InputHandler{
             if (game.getPhase().equals("setup")){
                 shipPointPrompt();
             } else {
+                view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0), game.getCurrentPlayerShipPoints());
                 attackPrompt();
             }
         }
