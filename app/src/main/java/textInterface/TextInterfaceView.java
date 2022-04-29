@@ -158,6 +158,7 @@ public class TextInterfaceView implements View {
     }
 
     public void playerPrompt(String player){
+        clearBoard();
         System.out.println(BLUE + player + "'s turn:" + RESET);
     }
 
@@ -198,5 +199,9 @@ public class TextInterfaceView implements View {
     @Override
     public void showErrorInvalidPosition() {
         System.out.println(RED + "Invalid board position" + RESET);
+    }
+
+    public void clearBoard() {
+        System.out.print("\033[H\033[2J");
     }
 }

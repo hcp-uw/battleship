@@ -33,6 +33,10 @@ application {
     mainClass.set("battleship.App")
 }
 
+tasks.withType<JavaExec>() {
+    standardInput = System.`in`
+}
+
 tasks.test {
     // Use junit platform for unit tests.
     useJUnitPlatform()
