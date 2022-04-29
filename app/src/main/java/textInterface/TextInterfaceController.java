@@ -137,6 +137,7 @@ public class TextInterfaceController implements InputHandler{
         if (input.length() < 2 || checkInvalidPoint(input)){
             view.showErrorUnknownInput();
             attackPrompt();
+            return;
         }
 
         // attack using the input point, and if invalid, display error
