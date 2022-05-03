@@ -160,7 +160,8 @@ public class TextInterfaceController implements InputHandler{
     /**
      * draws board and prompts for first point of ship
      */
-    private void shipPointPrompt(){
+    private void shipPointPrompt() {
+        view.playerPrompt(game.getCurrentPlayerName());
         view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0), game.getCurrentPlayerShipPoints());
         view.placeShipOfLength(getShipLength());
     }
