@@ -180,6 +180,7 @@ public class TextInterfaceController implements InputHandler{
             attackPrompt();
         } else {
             view.showWinner(game.getCurrentPlayerName());
+            this.controllerPhase = 2;
             view.playAgainPrompt();
         }
     }
