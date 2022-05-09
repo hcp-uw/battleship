@@ -152,6 +152,10 @@ public class TextInterfaceView implements View {
         return points;
     }
 
+    public void welcome(){
+        System.out.println("Welcome to Battleship!");
+    }
+
     @Override
     public void setupPrompt() {
         // TODO
@@ -215,6 +219,10 @@ public class TextInterfaceView implements View {
 
     public void showWinner(String player){
         System.out.println(BLUE + player + " wins!" + RESET);
+    }
+
+    public void playAgainPrompt(){
+        System.out.print("Would you like to play again? (y/n):");
     }
 
     @Override
