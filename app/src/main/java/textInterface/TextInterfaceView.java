@@ -157,6 +157,32 @@ public class TextInterfaceView implements View {
         // TODO
     }
 
+    /**
+     * Prompts the user for the number of human players to have
+     */
+    public void numPlayersPrompt() {
+        System.out.print("Number of players: ");
+    }
+
+    /**
+     * Prompts the user for the number of CPU players to have
+     */
+    public void numCPUPrompt() {
+        System.out.print("Number of CPUs: ");
+    }
+
+    /**
+     * Lists options for game settings
+     *
+     * @param options the options
+     */
+    public void showOptions(List<String> options) {
+        System.out.println("Choose your option:");
+        for (int i = 0; i < options.size(); i++) {
+            System.out.println(i + 1 + " - " + options.get(i));
+        }
+    }
+
     public void playerPrompt(String player){
         clearConsole();
         System.out.println(BLUE + player + "'s turn:" + RESET);
