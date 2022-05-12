@@ -7,9 +7,8 @@ import battleship.Game;
 import battleship.TwoPlayerGame;
 
 import java.util.List;
-import java.util.Locale;
 
-public class TextInterfaceController implements InputHandler{
+public class TextInterfaceController implements InputHandler {
 
     // This class does not represent an ADT
 
@@ -33,6 +32,12 @@ public class TextInterfaceController implements InputHandler{
      */
     private Point p;
 
+    private int gameSettingsStageIndex;
+
+    private static final String[] gameSettingsStages = {"numPlayers", "numCPUs", "boardLength"};
+
+    private GameSettings gameSettings;
+
 
     /**
      * Creates a new TextInterfaceController with the provided model and view
@@ -41,9 +46,11 @@ public class TextInterfaceController implements InputHandler{
      * @param game A model to use for computation and data.
      * @param view A view to use to display data to the user.
      */
-    public TextInterfaceController(TwoPlayerGame game, TextInterfaceView view){
+    public TextInterfaceController(TwoPlayerGame game, TextInterfaceView view) {
         this.game = game;
         this.view = view;
+        this.gameSettingsStageIndex = 0;
+        this.gameSettings = new GameSettings();
     }
 
 
@@ -57,8 +64,10 @@ public class TextInterfaceController implements InputHandler{
      */
     @Override
     public void start() {
-        view.placeShipPrompt();
-        shipPointPrompt();
+        view.startMenu();
+//        view.placeShipPrompt();
+//        shipPointPrompt();
+        view.numPlayersPrompt(GameSettings.MIN_PLAYERS, GameSettings.MAX_PLAYERS);
         view.begin();
     }
 
@@ -69,11 +78,23 @@ public class TextInterfaceController implements InputHandler{
      */
     @Override
     public void handleInput(String input) {
-        if(input.isEmpty()) {
-            System.out.println(input);
+        if (gameSettingsStageIndex < gameSettingsStages.length) {
+            switch (gameSettingsStages[gameSettingsStageIndex]) {
+                case "numPlayers":
+                    handleNumPlayers(input);
+                    break;
+                case "numCPUs":
+                    handleNumCPUs(input);
+                    break;
+                case "boardLength":
+                    handleBoardLength(input);
+                    break;
+                default:
+                    break;
+            }
             return;
         }
-        switch(game.getPhase()){
+        switch (game.getPhase()) {
             // phases - setup
             case "setup":
                 doShipSetup(input);
@@ -83,36 +104,102 @@ public class TextInterfaceController implements InputHandler{
             case "playing":
                 doInputAttack(input);
                 break;
-
+            case "end":
+                handlePlayAgain(input);
+                break;
             default:
                 break;
+        }
+    }
+
+    private void handlePlayAgain(String input) {
+        input = input.toLowerCase();
+        if (input.isEmpty() || input.charAt(0) != 'y') {
+            view.exit();
+        } else {
+            game.reset();
+            gameSettingsStageIndex = 0;
+            view.numPlayersPrompt(GameSettings.MIN_PLAYERS, GameSettings.MAX_PLAYERS);
+        }
+    }
+
+    private void handleNumPlayers(String input) {
+        Integer numPlayers = parseInt(input);
+        if (numPlayers == null) {
+            view.showErrorUnknownInput();
+            view.numPlayersPrompt(GameSettings.MIN_PLAYERS, GameSettings.MAX_PLAYERS);
+        } else if (numPlayers < GameSettings.MIN_PLAYERS || numPlayers > GameSettings.MAX_PLAYERS) {
+            view.showErrorInvalidInput();
+            view.numPlayersPrompt(GameSettings.MIN_PLAYERS, GameSettings.MAX_PLAYERS);
+        } else {
+            gameSettings.setNumPlayers(numPlayers);
+            gameSettingsStageIndex++;
+            view.numCPUsPrompt(GameSettings.MIN_CPUS, GameSettings.MAX_CPUS);
+        }
+    }
+
+    private void handleNumCPUs(String input) {
+        Integer numCPUs = parseInt(input);
+        if (numCPUs == null) {
+            view.showErrorUnknownInput();
+            view.numPlayersPrompt(GameSettings.MIN_CPUS, GameSettings.MAX_CPUS);
+        } else if (numPlayers < GameSettings.MIN_CPUS || numPlayers > GameSettings.MAX_CPUS) {
+            view.showErrorInvalidInput();
+            view.numPlayersPrompt(GameSettings.MIN_CPUS, GameSettings.MAX_CPUS);
+        } else {
+            gameSettings.setNumCPUs(numCPUs);
+            gameSettingsStageIndex++;
+            view.boardLengthPrompt(GameSettings.MIN_BOARD_LENGTH, GameSettings.MAX_BOARD_LENGTH);
+        }
+    }
+
+    private void handleBoardLength(String input) {
+        Integer boardLength = parseInt(input);
+        if (boardLength == null) {
+            view.showErrorUnknownInput();
+            view.boardLengthPrompt(GameSettings.MIN_BOARD_LENGTH, GameSettings.MAX_BOARD_LENGTH);
+        } else if (boardLength < GameSettings.MIN_BOARD_LENGTH || boardLength > GameSettings.MAX_BOARD_LENGTH) {
+            view.showErrorInvalidInput();
+            view.boardLengthPrompt(GameSettings.MIN_BOARD_LENGTH, GameSettings.MAX_BOARD_LENGTH);
+        } else {
+            gameSettings.setBoardLength(boardLength);
+            game.setSettings(gameSettings);
+            gameSettingsStageIndex++;
+        }
+    }
+
+    private static Integer parseInt(String input) {
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException nfe) {
+            return null;
         }
     }
 
     /**
      * Responds to user's input to set up the locations of their ship
      */
-    private void doShipSetup(String input){
+    private void doShipSetup(String input) {
         // check validity
         if (p == null && (input.length() < 2 || checkInvalidPoint(input))) {
             view.showErrorUnknownInput();
             view.placeShipOfLength(getShipLength());
             return;
-        } else if (p != null && checkInvalidOrientation(input)){
+        } else if (p != null && (input.length() < 1 || checkInvalidOrientation(input))) {
             view.showErrorUnknownInput();
             view.shipOrientationPrompt();
             return;
         }
 
         // deal with input
-        if (p == null){
+        if (p == null) {
             p = new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0');
             game.processTurn(p);
             view.shipOrientationPrompt();
         } else {
             char orientation = input.toLowerCase().charAt(0);
             // calculate second point, pass in to processTurn
-            boolean valid = game.processTurn(calculateSecond(orientation,getShipLength()));
+            boolean valid = game.processTurn(calculateSecond(orientation, getShipLength()));
 
             // Note that p is not saved because if the Point is on a ship, both point and orientation need to be rechosen,
             // not just the orientation
@@ -122,7 +209,7 @@ public class TextInterfaceController implements InputHandler{
             }
 
             // check phase
-            if (game.getPhase().equals("setup")){
+            if (game.getPhase().equals("setup")) {
                 shipPointPrompt();
             } else {
                 view.drawBoard(game.getPlayerView(game.getCurrentPlayer()).get(0), game.getCurrentPlayerShipPoints());
@@ -134,27 +221,26 @@ public class TextInterfaceController implements InputHandler{
     /**
      * Responds to user's input to attack coordinates
      */
-    private void doInputAttack(String input){
-        if (input.length() < 2 || checkInvalidPoint(input)){
+    private void doInputAttack(String input) {
+        if (input.length() < 2 || checkInvalidPoint(input)) {
             view.showErrorUnknownInput();
             attackPrompt();
             return;
         }
 
         // attack using the input point, and if invalid, display error
-        if (!game.processTurn(new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0'))){
+        if (!game.processTurn(new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0'))) {
             view.showErrorInvalidPosition();
         }
 
         // read current phase
-        if (game.getPhase().equals("playing")){
+        if (game.getPhase().equals("playing")) {
             attackPrompt();
         } else {
             view.showWinner(game.getCurrentPlayerName());
-            view.exit();
+            view.playAgainPrompt();
         }
     }
-
 
 
     /**
@@ -169,11 +255,11 @@ public class TextInterfaceController implements InputHandler{
     /**
      * draws player boards for player attack phase and prompts for attack point
      */
-    private void attackPrompt(){
+    private void attackPrompt() {
         view.playerPrompt(game.getCurrentPlayerName());
         List<BoardView> boards = game.getPlayerView(game.getCurrentPlayer());
         view.drawBoard(boards.get(0), game.getCurrentPlayerShipPoints());
-        for (int i = 1; i < boards.size(); i++){
+        for (int i = 1; i < boards.size(); i++) {
             view.drawBoard(boards.get(i));
         }
         view.attackPrompt();
@@ -182,10 +268,10 @@ public class TextInterfaceController implements InputHandler{
     /**
      * returns length of ship to be set up
      */
-    private int getShipLength(){
+    private int getShipLength() {
         int[] temp = game.getShipsToBePlaced(game.getCurrentPlayer());
         int index = 0;
-        while (index < temp.length && temp[index] == 0){
+        while (index < temp.length && temp[index] == 0) {
             index++;
         }
         return index;
@@ -195,7 +281,7 @@ public class TextInterfaceController implements InputHandler{
     /**
      * private method to check if input point is valid
      */
-    private boolean checkInvalidPoint(String input){
+    private boolean checkInvalidPoint(String input) {
         char letter = input.toUpperCase().charAt(0);
         char number = input.charAt(1);
         return letter < 'A' || letter > 'A' + game.size() || number < '0' || number > '0' + game.size();
@@ -206,8 +292,8 @@ public class TextInterfaceController implements InputHandler{
      */
     private boolean checkInvalidOrientation(String input) {
         char check = input.toLowerCase().charAt(0);
-        for (char c: ORIENTATIONS){
-            if (c == check){
+        for (char c : ORIENTATIONS) {
+            if (c == check) {
                 return false;
             }
         }
@@ -217,15 +303,15 @@ public class TextInterfaceController implements InputHandler{
     /**
      * private method to calculate second point
      */
-    private Point calculateSecond(char orientation, int length){
+    private Point calculateSecond(char orientation, int length) {
         length = length - 1;
         int x = p.getX();
         int y = p.getY();
         if (orientation == ORIENTATIONS[0]) { // u
             y -= length;
-        } else if (orientation == ORIENTATIONS[1]){ // d
+        } else if (orientation == ORIENTATIONS[1]) { // d
             y += length;
-        } else if (orientation == ORIENTATIONS[2]){ // l
+        } else if (orientation == ORIENTATIONS[2]) { // l
             x -= length;
         } else if (orientation == ORIENTATIONS[3]) { // r
             x += length;

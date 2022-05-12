@@ -78,8 +78,6 @@ public class TextInterfaceView implements View {
     @Override
     public void startMenu() {
         System.out.println("Welcome to Battleship");
-        System.out.print("Would you like to play against the computer or "
-                         + "or against another player? ");
     }
 
     @Override
@@ -160,15 +158,27 @@ public class TextInterfaceView implements View {
     /**
      * Prompts the user for the number of human players to have
      */
-    public void numPlayersPrompt() {
-        System.out.print("Number of players: ");
+    public void numPlayersPrompt(int min, int max) {
+        numThingPrompt("players", min, max);
     }
 
     /**
      * Prompts the user for the number of CPU players to have
      */
-    public void numCPUPrompt() {
-        System.out.print("Number of CPUs: ");
+    public void numCPUsPrompt(int min, int max) {
+        numThingPrompt("CPUs", min, max);
+    }
+
+    public void numThingPrompt(String thing, int min, int max) {
+        System.out.print("Number of " + thing + " (" + min + "-" + max + "): ");
+    }
+
+    public void boardLengthPrompt(int min, int max) {
+        System.out.print("Board length (" + min + "-" + max + "): ");
+    }
+
+    public void playAgainPrompt() {
+        System.out.print("Play again? ");
     }
 
     /**
@@ -176,10 +186,17 @@ public class TextInterfaceView implements View {
      *
      * @param options the options
      */
-    public void showOptions(List<String> options) {
+    public void showOptionsEnumerated(List<String> options) {
         System.out.println("Choose your option:");
         for (int i = 0; i < options.size(); i++) {
             System.out.println(i + 1 + " - " + options.get(i));
+        }
+    }
+
+    public void showOptions(List<String> options) {
+        System.out.println("Choose your option:");
+        for (String option : options) {
+            System.out.println(option);
         }
     }
 
@@ -225,6 +242,10 @@ public class TextInterfaceView implements View {
     @Override
     public void showErrorInvalidPosition() {
         System.out.println(RED + "Invalid board position" + RESET);
+    }
+
+    public void showErrorInvalidInput() {
+        System.out.println(RED + "Invalid input" + RESET);
     }
 
     public void clearConsole() {
