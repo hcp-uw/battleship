@@ -4,7 +4,7 @@ public class ComputerPlayer extends Player {
 
     private static final int DEFAULT_DIFFICULTY = 0;
 
-    private final int difficulty;
+    private AttackGenerator attackGenerator;
 
     public ComputerPlayer(int id, Ship[] ships, int board_size) {
         this(id, ships, board_size, DEFAULT_DIFFICULTY);
@@ -12,7 +12,14 @@ public class ComputerPlayer extends Player {
 
     public ComputerPlayer(int id, Ship[] ships, int board_size, int difficulty) {
         super(id, ships, board_size);
-        this.difficulty = difficulty;
+        switch (difficulty) {
+            case 0:
+                this.attackGenerator = new RandomAttackGenerator(board_size);
+                break;
+            case 1:
+                this.attackGenerator = new SmartAttackGenerator(board_size);
+                break;
+        }
     }
 
     public Point[] generateShip(int length) {
@@ -25,12 +32,10 @@ public class ComputerPlayer extends Player {
         } else { // vertical
             points[1] = new Point(points[0].getX(), points[0].getY() + (length - 1) * multiplier);
         }
-//        return new Point[] {new Point(0, 0), new Point(0, 1)};
         return points;
     }
 
     public Point getAttackPoint() {
-        int boardSize = this.getBoard().size();
-        return new Point((int) (Math.random() * boardSize), (int) (Math.random() * boardSize));
+        return attackGenerator.getAttackPoint();
     }
 }

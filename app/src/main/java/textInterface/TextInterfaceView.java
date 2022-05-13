@@ -152,9 +152,39 @@ public class TextInterfaceView implements View {
         return points;
     }
 
+    public void welcome(){
+        System.out.println("Welcome to Battleship!");
+    }
+
     @Override
     public void setupPrompt() {
         // TODO
+    }
+
+    /**
+     * Prompts the user for the number of human players to have
+     */
+    public void numPlayersPrompt() {
+        System.out.print("Number of players: ");
+    }
+
+    /**
+     * Prompts the user for the number of CPU players to have
+     */
+    public void numCPUPrompt() {
+        System.out.print("Number of CPUs: ");
+    }
+
+    /**
+     * Lists options for game settings
+     *
+     * @param options the options
+     */
+    public void showOptions(List<String> options) {
+        System.out.println("Choose your option:");
+        for (int i = 0; i < options.size(); i++) {
+            System.out.println(i + 1 + " - " + options.get(i));
+        }
     }
 
     public void playerPrompt(String player){
@@ -189,6 +219,10 @@ public class TextInterfaceView implements View {
 
     public void showWinner(String player){
         System.out.println(BLUE + player + " wins!" + RESET);
+    }
+
+    public void playAgainPrompt(){
+        System.out.print("Would you like to play again? (y/n):");
     }
 
     @Override

@@ -7,7 +7,6 @@ import battleship.Game;
 import battleship.TwoPlayerGame;
 
 import java.util.List;
-import java.util.Locale;
 
 public class TextInterfaceController implements InputHandler{
 
@@ -33,6 +32,9 @@ public class TextInterfaceController implements InputHandler{
      */
     private Point p;
 
+    private static final String[] CONTROLLER_PHASES = {"settings", "game", "play again"};
+    private int controllerPhase;
+
 
     /**
      * Creates a new TextInterfaceController with the provided model and view
@@ -44,6 +46,7 @@ public class TextInterfaceController implements InputHandler{
     public TextInterfaceController(TwoPlayerGame game, TextInterfaceView view){
         this.game = game;
         this.view = view;
+        this.controllerPhase = 0;
     }
 
 
@@ -57,8 +60,8 @@ public class TextInterfaceController implements InputHandler{
      */
     @Override
     public void start() {
-        view.placeShipPrompt();
-        shipPointPrompt();
+        view.welcome();
+        settingsPrompt();
         view.begin();
     }
 
@@ -73,20 +76,46 @@ public class TextInterfaceController implements InputHandler{
             System.out.println(input);
             return;
         }
-        switch(game.getPhase()){
-            // phases - setup
-            case "setup":
-                doShipSetup(input);
-                break;
+        switch(this.controllerPhase){
+            case 0:
+                doSettingsPhase(input);
 
-            // phases - attack
-            case "playing":
-                doInputAttack(input);
-                break;
+            case 1:
+                switch(game.getPhase()){
+                    // phases - setup
+                    case "setup":
+                        doShipSetup(input);
+                        break;
+
+                    // phases - attack
+                    case "playing":
+                        doInputAttack(input);
+                        break;
+
+                    default:
+                        break;
+                }
+            case 2:
+                parsePlayAgain(input);
 
             default:
                 break;
         }
+
+    }
+
+
+    private void doSettingsPhase(String input){
+        // TODO: Game Settings merged here
+        // needs to set controllerPhase to 1 after settings are all done
+            /* (copied from start when the first phase was ship setup)
+            view.placeShipPrompt();
+            shipPointPrompt();
+             */
+    }
+
+    private void settingsPrompt(){
+        // TODO: Game Settings calls to View
     }
 
     /**
@@ -151,11 +180,21 @@ public class TextInterfaceController implements InputHandler{
             attackPrompt();
         } else {
             view.showWinner(game.getCurrentPlayerName());
-            view.exit();
+            view.playAgainPrompt();
         }
     }
 
-
+    /**
+     * Parses play again
+     */
+    private void parsePlayAgain(String input){
+        if (input.toLowerCase().charAt(0) == 'y'){
+            this.controllerPhase = 0;
+            settingsPrompt();
+        } else {
+            view.exit();
+        }
+    }
 
     /**
      * draws board and prompts for first point of ship
