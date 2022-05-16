@@ -8,6 +8,7 @@ import java.util.AbstractMap.SimpleEntry;
  */
 public class GameSettings {
     public static List<SimpleEntry<String, List<String>>> ENUM_OPTIONS = List.of(
+            // TODO convert these to triples
             new SimpleEntry<>("mode", List.of("2player", "cpu")),
             new SimpleEntry<>("boardsize", List.of("5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15")),
             new SimpleEntry<>("cpudifficulty", List.of("easy", "normal")),
