@@ -18,16 +18,32 @@ public class GameSettings {
 
     private final Map<String, String> choices;
     private final Iterator<SimpleEntry<String, List<String>>> optionSetIter;
+    private int curSettingIndex;
 
     public GameSettings() {
         this.choices = new HashMap<>();
         this.optionSetIter = ENUM_OPTIONS.iterator();
+        this.curSettingIndex = 0;
     }
 
+    /**
+     * gets the current choice that has yet to be set in this GameSettings object
+     * @return an entry (key, value) where key is the option and value is a list of possibilities
+     */
     public SimpleEntry<String, List<String>> getAvailableChoices() {
-        if (this.optionSetIter.hasNext())
-        return this.optionSetIter.next();
+        if (this.curSettingIndex < ENUM_OPTIONS.size())
+        return ENUM_OPTIONS.get(this.curSettingIndex);
         return null;
+    }
+
+    /**
+     * sets the current choice that has yet to be set (next choice in list), then updates the "current option"
+     * to be the next optioin
+     * @param val the string value to set the option to
+     */
+    public void setCurChoice(String val) {
+        this.choices.put(getAvailableChoices().getKey(), val);
+        this.curSettingIndex++;
     }
 
     public void setChoice(String op, String val) {
