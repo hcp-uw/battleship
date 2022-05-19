@@ -10,9 +10,9 @@ import java.util.AbstractMap.SimpleEntry;
  */
 public class GameSettings {
     enum OptionType {
-        CHOICES,
-        RANGE,
-        TEXTENTRY
+        CHOICES,    // read out all the choices as a list of options
+        RANGE,      // INTEGERS - take the first two elements of the list and use those as upper and lower bounds
+        TEXTENTRY   // Empty list - allow for free-form text entry
     }
 
     public static List<Triple<String, OptionType, List<String>>> ENUM_OPTIONS = List.of(
