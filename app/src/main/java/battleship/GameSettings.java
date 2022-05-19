@@ -1,5 +1,7 @@
 package battleship;
 
+import utils.Triple;
+
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
@@ -7,23 +9,26 @@ import java.util.AbstractMap.SimpleEntry;
  * A class representing the settings that a game will be set up with
  */
 public class GameSettings {
-    public static List<SimpleEntry<String, List<String>>> ENUM_OPTIONS = List.of(
-            // TODO convert these to triples
-            new SimpleEntry<>("mode", List.of("2player", "cpu")),
-            new SimpleEntry<>("boardsize", List.of("5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15")),
-            new SimpleEntry<>("cpudifficulty", List.of("easy", "normal")),
-            new SimpleEntry<>("playernames", List.of()) // empty list represents free-form input
+    enum OptionType {
+        CHOICES,
+        RANGE,
+        TEXTENTRY
+    }
 
-//            new SimpleEntry<>()
+    public static List<Triple<String, OptionType, List<String>>> ENUM_OPTIONS = List.of(
+            new Triple<>("mode", OptionType.CHOICES, List.of("2player", "cpu")),
+            new Triple<>("boardsize", OptionType.RANGE, List.of("5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15")),
+            new Triple<>("cpudifficulty", OptionType.CHOICES, List.of("easy", "normal")),
+            new Triple<>("playernames", OptionType.TEXTENTRY, List.of()) // empty list represents free-form input
     );
 
     private final Map<String, String> choices;
-    private final Iterator<SimpleEntry<String, List<String>>> optionSetIter;
+//    private final Iterator<SimpleEntry<String, List<String>>> optionSetIter;
     private int curSettingIndex;
 
     public GameSettings() {
         this.choices = new HashMap<>();
-        this.optionSetIter = ENUM_OPTIONS.iterator();
+//        this.optionSetIter = ENUM_OPTIONS.iterator();
         this.curSettingIndex = 0;
     }
 
@@ -31,7 +36,7 @@ public class GameSettings {
      * gets the current choice that has yet to be set in this GameSettings object
      * @return an entry (key, value) where key is the option and value is a list of possibilities
      */
-    public SimpleEntry<String, List<String>> getAvailableChoices() {
+    public Triple<String, OptionType, List<String>> getAvailableChoices() {
         if (this.curSettingIndex < ENUM_OPTIONS.size())
         return ENUM_OPTIONS.get(this.curSettingIndex);
         return null;
@@ -43,7 +48,7 @@ public class GameSettings {
      * @param val the string value to set the option to
      */
     public void setCurChoice(String val) {
-        this.choices.put(getAvailableChoices().getKey(), val);
+        this.choices.put(getAvailableChoices().getFirst(), val);
         this.curSettingIndex++;
     }
 
