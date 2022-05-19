@@ -212,11 +212,11 @@ public class TextInterfaceView implements View {
     }
 
     public void showOptionRange(int low, int high) {
-        System.out.println("Enter a value between " + low + " and " + high + ":");
+        System.out.print("Enter a value between " + low + " and " + high + ": ");
     }
 
     public void showOptionFreeform() {
-        System.out.println("Enter text input:");
+        System.out.print("Enter text input: ");
     }
 
     //
