@@ -9,6 +9,9 @@ import battleship.TwoPlayerGame;
 import java.util.List;
 import java.util.Locale;
 
+import battleship.GameSettings;
+import utils.Triple;
+
 public class TextInterfaceController implements InputHandler {
 
     // This class does not represent an ADT
@@ -21,7 +24,7 @@ public class TextInterfaceController implements InputHandler {
     /**
      * The data-carrier and processor for the application.
      */
-    private final TwoPlayerGame game;
+    private TwoPlayerGame game;
 
     /**
      * The user-facing view and input receiver for this application.
@@ -51,6 +54,10 @@ public class TextInterfaceController implements InputHandler {
         this.view = view;
         this.gameSettings = new GameSettings();
         this.controllerPhase = 0;
+    }
+
+    public TextInterfaceController(TextInterfaceView view) {
+        this(null, view);
     }
 
 
@@ -83,7 +90,7 @@ public class TextInterfaceController implements InputHandler {
         switch (this.controllerPhase) {
             case 0:
                 doSettingsPhase(input);
-
+                break;
             case 1:
                 switch (game.getPhase()) {
                     // phases - setup
@@ -96,18 +103,28 @@ public class TextInterfaceController implements InputHandler {
                         doInputAttack(input);
                         break;
 
+                    case "end":
+                        // umm? ideally this won't actually be reached since we should set controller phase to 2
+                        // after the game ends
+                        break;
+
                     default:
                         break;
                 }
+                break;
             case 2:
                 parsePlayAgain(input);
-
+                break;
             default:
                 break;
         }
 
     }
 
+    // the initial settings prompt after opening the game
+    private void settingsPrompt() {
+        doSettingsPhase("");
+    }
 
     private void doSettingsPhase(String input) {
         // TODO: Game Settings merged here
@@ -116,10 +133,67 @@ public class TextInterfaceController implements InputHandler {
             view.placeShipPrompt();
             shipPointPrompt();
              */
+        // settings phase consists of going through all the settings and setting them
+        Triple<String, GameSettings.OptionType, List<String>> curOption = gameSettings.getAvailableChoices();
+        if (!input.equals("")) {
+            switch (curOption.getSecond()) {
+                case CHOICES:
+                    // TODO input validation for ints, valid indices
+                    gameSettings.setCurChoice(curOption.getThird().get(Integer.parseInt(input) - 1));
+                    break;
+                case RANGE:
+                    // TODO input validation for value actually in the range
+                    gameSettings.setCurChoice(Integer.toString(Integer.parseInt(input))); // i think this will handle whitespace and some noninteger chars?
+                    break;
+                case TEXTENTRY:
+                    gameSettings.setCurChoice(input);
+                    // TODO - make Game class actually set up the names when playernames received through here
+                    break;
+                default:
+                    // getting here indicates a programmer mistake
+                    throw new RuntimeException("Encountered bad option type");
+            }
+        }
+        if (gameSettings.isComplete()) {
+            controllerPhase = 1; // end the game setup phase
+            // initialize up new game
+            if (game == null || game.getPhase().equals("end")) {
+                game = new TwoPlayerGame(gameSettings);
+            }
+            // manually start the game w/ corresponding prompts
+            // this sequence of calls was referenced from commit @9f4faf3
+            // seems to be how the game was directly just started before
+            view.placeShipPrompt();
+            shipPointPrompt();
+        } else {
+            curOption = gameSettings.getAvailableChoices();
+            settingsPrompt(curOption.getFirst(), curOption.getSecond(), curOption.getThird());
+        }
     }
 
-    private void settingsPrompt() {
+    /**
+     * Settings prompt based on what the next setting to enter is
+     * @param name the name of the setting
+     * @param type the type of the setting - see GameSettings.OptionType
+     * @param choices list of string choices for the setting
+     */
+    private void settingsPrompt(String name, GameSettings.OptionType type, List<String> choices) {
         // TODO: Game Settings calls to View
+        view.setupPrompt(name);
+        switch (type) {
+            case CHOICES:
+                view.showOptionsEnumerated(choices);
+                break;
+            case RANGE:
+                view.showOptionRange(Integer.parseInt(choices.get(0)), Integer.parseInt(choices.get(1)));
+                break;
+            case TEXTENTRY:
+                view.showOptionFreeform();
+                break;
+            default:
+                // getting here indicates a programmer mistake
+                throw new RuntimeException("Encountered bad option type");
+        }
     }
 
     /**
@@ -185,6 +259,8 @@ public class TextInterfaceController implements InputHandler {
         } else {
             view.showWinner(game.getCurrentPlayerName());
             view.playAgainPrompt();
+            // and set the phases as well so we actually parse the play again response
+            this.controllerPhase = 2;
         }
     }
 
@@ -193,8 +269,17 @@ public class TextInterfaceController implements InputHandler {
      */
     private void parsePlayAgain(String input) {
         if (input.toLowerCase().charAt(0) == 'y') {
-            this.controllerPhase = 0;
-            settingsPrompt();
+//            this.controllerPhase = 0;
+//            this.gameSettings = new GameSettings(); // reset the game settings
+//            settingsPrompt();
+            // or alternatively just reset the game directly and start it again
+            // if the user wants to reset the settings they can just quit the program and restart it
+            // TODO: decide what we want to do here
+
+            this.controllerPhase = 1;
+            this.game = new TwoPlayerGame(this.gameSettings);
+            view.placeShipPrompt();
+            shipPointPrompt();
         } else {
             view.exit();
         }
