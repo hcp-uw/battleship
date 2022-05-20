@@ -10,9 +10,10 @@ import textInterface.View;
 
 public class App {
     public static void main(String[] args) {
-        TwoPlayerGame game = new TwoPlayerGame(10);
+//        TwoPlayerGame game = new TwoPlayerGame(10);
         TextInterfaceView view = new TextInterfaceView();
-        TextInterfaceController controller = new TextInterfaceController(game, view);
+//        TextInterfaceController controller = new TextInterfaceController(game, view);
+        TextInterfaceController controller = new TextInterfaceController(view);
         view.setInputHandler(controller);
         controller.start();
     }

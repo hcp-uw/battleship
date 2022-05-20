@@ -15,7 +15,8 @@ import java.util.*;
 public class Game {
 
     // represents ships of lengths [2, 3, 3, 4, 5]
-    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 1, 0, 0};
+//    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 1, 0, 0};
+    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 0, 0, 0};
     // default board size is 10x10
     private static final int DEFAULT_SIZE = 10;
     // 3 phases of game
@@ -24,7 +25,7 @@ public class Game {
     private final int gameBoardSize;
     private int currentGamePhase;
     private final Map<Integer, Player> players;
-    private final List<Integer> playerIdList; // a list containing PIDs
+    protected final List<Integer> playerIdList; // a list containing PIDs
     private int currentPlayerIndex; // current player represented by index in PID list
     private List<GameListener> listeners;
     private final int[] allowableShipSet;
@@ -45,9 +46,9 @@ public class Game {
      * @param boardSize the size of the boards for the game
      * @param shipsInfo a mapping of ship sizes to counts represented by an array where indices are the sizes
      */
-    public Game(int playerCount, int boardSize, int[] shipsInfo) {
+    public Game(int playerCount, int cpuCount, int boardSize, int[] shipsInfo) {
         this.players = new HashMap<>();
-        generatePlayers(playerCount, boardSize);
+        generatePlayers(playerCount, cpuCount, boardSize);
 
         this.gameBoardSize = boardSize;
 
@@ -64,32 +65,83 @@ public class Game {
 
     // constructor assuming default ships
     public Game(int playerCount, int boardSize) {
-        this(playerCount, boardSize, DEFAULT_SHIPS);
+        this(playerCount, 0, boardSize, DEFAULT_SHIPS);
+    }
+
+    // constructor assuming default ships
+    public Game(int playerCount, int cpuCount, int boardSize) {
+        this(playerCount, cpuCount, boardSize, DEFAULT_SHIPS);
     }
 
     // constructor assuming default board size and ships
     public Game(int playerCount) {
-        this(playerCount, DEFAULT_SIZE, DEFAULT_SHIPS);
+        this(playerCount, 0, DEFAULT_SIZE, DEFAULT_SHIPS);
     }
 
     // constructor assuming default board size
     // on SO someone recommended using Builder pattern for default values since java doesn't have
     // default parameters
     public Game(int playerCount, int[] shipsInfo) {
-        this(playerCount, DEFAULT_SIZE, shipsInfo);
+        this(playerCount, 0, DEFAULT_SIZE, shipsInfo);
+    }
+
+    public Game(GameSettings g) {
+        this(getGameSettingsNumPlayers(g), getGameSettingsNumCpus(g), Integer.parseInt(g.getSetting("board size")));
+        // hack way assumes player name input is delineated by spaces and in order
+        String[] names = g.getSetting("player names").split(" ");
+        if (names.length != 0) {  // perhaps if want default names just no input?
+            for (int i = 0; i < playerIdList.size(); i++) {
+                setPlayerName(playerIdList.get(i), names[i]);
+            }
+        }
+    }
+
+    /**
+     * get the number of human players from a GameSettings object based on its mode
+     * @param g the GameSettings to read
+     * @return an integer number of human players
+     */
+    static int getGameSettingsNumPlayers(GameSettings g) {
+        switch (g.getSetting("mode")) {
+            case "cpu":
+                return 1;
+            case "2player":
+                return 2;
+            default:
+                throw new RuntimeException("encountered a mode we don't know about");
+        }
+    }
+
+    /**
+     * get the number of cpu players from a GameSettings object based on its mode
+     * @param g the GameSettings to read
+     * @return an integer number of cpu players
+     */
+    static int getGameSettingsNumCpus(GameSettings g) {
+        switch (g.getSetting("mode")) {
+            case "cpu":
+                return 1;
+            case "2player":
+                return 0;
+            default:
+                throw new RuntimeException("encountered a mode we don't know about");
+        }
     }
 
     /**
      * makes players and puts them in this.players, assigning an ID to each
      * @param count the number of players to generate
      */
-    private void generatePlayers(int count, int boardSize) {
+    private void generatePlayers(int count, int cpucount, int boardSize) {
         int baseId = 1;
         for (int i = 0; i < count; i++) {
             int pid = baseId + i;
             this.players.put(pid, new Player(pid, new Ship[0], boardSize));
         }
-        this.players.put(2, new ComputerPlayer(2, new Ship[0], boardSize));
+        for (int j = 0; j < cpucount; j++) {
+            int pid = baseId + j + count;
+            this.players.put(pid, new ComputerPlayer(pid, new Ship[0], boardSize));
+        }
     }
 
     /**
