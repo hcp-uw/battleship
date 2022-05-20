@@ -92,7 +92,8 @@ public class TextInterfaceView implements View {
     }
 
     public void drawBoard(BoardView board, Set<Point> shipPoints) {
-        int boardSize = 10;
+//        int boardSize = 10;
+        int boardSize = board.size();
         StringBuilder builder = new StringBuilder();
         builder.append(" ");
         for (char letter = 'A'; letter < 'A' + boardSize; letter++) {
@@ -154,9 +155,14 @@ public class TextInterfaceView implements View {
         System.out.println("Welcome to Battleship!");
     }
 
+    //
+    //  GAME SETUP METHODS
+    //
+
     @Override
-    public void setupPrompt() {
-        // TODO
+    public void setupPrompt(String name) {
+        // jason-  I am taking over this method for my uses since it wasn't completed nor fully specified
+        System.out.println("Setup [ " + name + " ]:");
     }
 
     /**
@@ -181,9 +187,10 @@ public class TextInterfaceView implements View {
         System.out.print("Board length (" + min + "-" + max + "): ");
     }
 
-    public void playAgainPrompt() {
-        System.out.print("Play again? ");
-    }
+    // jason- removed since we have the other one already
+//    public void playAgainPrompt() {
+//        System.out.print("Play again? ");
+//    }
 
     /**
      * Lists options for game settings
@@ -203,6 +210,18 @@ public class TextInterfaceView implements View {
             System.out.println(option);
         }
     }
+
+    public void showOptionRange(int low, int high) {
+        System.out.print("Enter a value between " + low + " and " + high + ": ");
+    }
+
+    public void showOptionFreeform() {
+        System.out.print("Enter text input: ");
+    }
+
+    //
+    //  GAME METHODS
+    //
 
     public void playerPrompt(String player){
         clearConsole();

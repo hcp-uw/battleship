@@ -15,7 +15,8 @@ import java.util.*;
 public class Game {
 
     // represents ships of lengths [2, 3, 3, 4, 5]
-    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 1, 0, 0};
+//    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 1, 0, 0};
+    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 0, 0, 0};
     // default board size is 10x10
     private static final int DEFAULT_SIZE = 10;
     // 3 phases of game
@@ -85,12 +86,12 @@ public class Game {
     }
 
     public Game(GameSettings g) {
-        this(getGameSettingsNumPlayers(g), getGameSettingsNumCpus(g), Integer.parseInt(g.getSetting("boardsize")));
+        this(getGameSettingsNumPlayers(g), getGameSettingsNumCpus(g), Integer.parseInt(g.getSetting("board size")));
         // hack way assumes player name input is delineated by spaces and in order
-        String[] names = g.getSetting("playernames").split(" ");
+        String[] names = g.getSetting("player names").split(" ");
         if (names.length != 0) {  // perhaps if want default names just no input?
-            for (int i : playerIdList) {
-                setPlayerName(i, names[i]);
+            for (int i = 0; i < playerIdList.size(); i++) {
+                setPlayerName(playerIdList.get(i), names[i]);
             }
         }
     }
