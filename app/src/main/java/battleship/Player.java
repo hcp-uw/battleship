@@ -104,7 +104,10 @@ public class Player {
 
         boolean result = other.receive(p);
         boolean validResult;
-        if (result) validResult = this.opponentBoards.get(other).addHit(p);
+        if (result) {
+            validResult = this.opponentBoards.get(other).addHit(p);
+            this.notifyHit();
+        }
         else validResult = this.opponentBoards.get(other).addMiss(p);
         checkRep();
         if (!validResult) throw new IllegalArgumentException("Tried to attack position that was already guessed");
@@ -208,4 +211,10 @@ public class Player {
         return id + "\n" + ships + "\n" + board;
     }
 
+    /**
+     * Notifies this instance of Player that it has successfully hit its opponent
+     */
+    public void notifyHit(){
+
+    }
 }

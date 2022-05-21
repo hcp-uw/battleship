@@ -46,9 +46,9 @@ public class Game {
      * @param boardSize the size of the boards for the game
      * @param shipsInfo a mapping of ship sizes to counts represented by an array where indices are the sizes
      */
-    public Game(int playerCount, int cpuCount, int boardSize, int[] shipsInfo) {
+    public Game(int playerCount, int cpuCount, int cpuDifficulty, int boardSize, int[] shipsInfo) {
         this.players = new HashMap<>();
-        generatePlayers(playerCount, cpuCount, boardSize);
+        generatePlayers(playerCount, cpuCount, cpuDifficulty, boardSize);
 
         this.gameBoardSize = boardSize;
 
@@ -65,28 +65,29 @@ public class Game {
 
     // constructor assuming default ships
     public Game(int playerCount, int boardSize) {
-        this(playerCount, 0, boardSize, DEFAULT_SHIPS);
+        this(playerCount, 0, 0, boardSize, DEFAULT_SHIPS);
     }
 
     // constructor assuming default ships
-    public Game(int playerCount, int cpuCount, int boardSize) {
-        this(playerCount, cpuCount, boardSize, DEFAULT_SHIPS);
+    public Game(int playerCount, int cpuCount, int cpuDifficulty, int boardSize) {
+        this(playerCount, cpuCount, cpuDifficulty, boardSize, DEFAULT_SHIPS);
     }
 
     // constructor assuming default board size and ships
     public Game(int playerCount) {
-        this(playerCount, 0, DEFAULT_SIZE, DEFAULT_SHIPS);
+        this(playerCount, 0, 0, DEFAULT_SIZE, DEFAULT_SHIPS);
     }
 
     // constructor assuming default board size
     // on SO someone recommended using Builder pattern for default values since java doesn't have
     // default parameters
     public Game(int playerCount, int[] shipsInfo) {
-        this(playerCount, 0, DEFAULT_SIZE, shipsInfo);
+        this(playerCount, 0, 0, DEFAULT_SIZE, shipsInfo);
     }
 
     public Game(GameSettings g) {
-        this(getGameSettingsNumPlayers(g), getGameSettingsNumCpus(g), Integer.parseInt(g.getSetting("board size")));
+        this(getGameSettingsNumPlayers(g), getGameSettingsNumCpus(g),
+             getGameSettingsCpuDifficulty(g), Integer.parseInt(g.getSetting("board size")));
         // hack way assumes player name input is delineated by spaces and in order
         String[] names = g.getSetting("player names").split(" ");
         if (names.length != 0) {  // perhaps if want default names just no input?
@@ -129,10 +130,26 @@ public class Game {
     }
 
     /**
+     * get the cpu difficulty from a GameSettings object
+     * @param g the GameSettings to read
+     * @return an integer cpu difficulty
+     */
+    static int getGameSettingsCpuDifficulty(GameSettings g) {
+        switch (g.getSetting("cpu difficulty")) {
+            case "normal":
+                return 1;
+            case "difficult":
+                return 2;
+            default:
+                return 0;
+        }
+    }
+
+    /**
      * makes players and puts them in this.players, assigning an ID to each
      * @param count the number of players to generate
      */
-    private void generatePlayers(int count, int cpucount, int boardSize) {
+    private void generatePlayers(int count, int cpucount, int cpudifficulty, int boardSize) {
         int baseId = 1;
         for (int i = 0; i < count; i++) {
             int pid = baseId + i;
@@ -140,7 +157,7 @@ public class Game {
         }
         for (int j = 0; j < cpucount; j++) {
             int pid = baseId + j + count;
-            this.players.put(pid, new ComputerPlayer(pid, new Ship[0], boardSize));
+            this.players.put(pid, new ComputerPlayer(pid, new Ship[0], boardSize, cpudifficulty));
         }
     }
 
