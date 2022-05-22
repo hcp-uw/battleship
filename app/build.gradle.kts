@@ -41,3 +41,9 @@ tasks.test {
     // Use junit platform for unit tests.
     useJUnitPlatform()
 }
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "battleship.App"
+    }
+}
