@@ -127,23 +127,37 @@ public class TextInterfaceController implements InputHandler {
     }
 
     private void doSettingsPhase(String input) {
-        // TODO: Game Settings merged here
-        // needs to set controllerPhase to 1 after settings are all done
-            /* (copied from start when the first phase was ship setup)
-            view.placeShipPrompt();
-            shipPointPrompt();
-             */
         // settings phase consists of going through all the settings and setting them
         Triple<String, GameSettings.OptionType, List<String>> curOption = gameSettings.getAvailableChoices();
         if (!input.equals("")) {
             switch (curOption.getSecond()) {
                 case CHOICES:
-                    // TODO input validation for ints, valid indices
-                    gameSettings.setCurChoice(curOption.getThird().get(Integer.parseInt(input) - 1));
+                    try {
+                        int val = Integer.parseInt(input);
+                        if (val < 1 || val > curOption.getThird().size()){
+                            // handles input in range of indices
+                            view.showErrorInvalidInput();
+                        } else {
+                            gameSettings.setCurChoice(curOption.getThird().get(val - 1));
+                        }
+                    } catch (NumberFormatException notInteger){
+                        // handles non-integer input
+                        view.showErrorInvalidInput();
+                    }
                     break;
                 case RANGE:
-                    // TODO input validation for value actually in the range
-                    gameSettings.setCurChoice(Integer.toString(Integer.parseInt(input))); // i think this will handle whitespace and some noninteger chars?
+                    try {
+                        int val = Integer.parseInt(input);
+                        if (val < Integer.parseInt(curOption.getThird().get(0)) || val > Integer.parseInt(curOption.getThird().get(1))) {
+                            // handles input in range of values
+                            view.showErrorInvalidInput();
+                        } else {
+                            gameSettings.setCurChoice(Integer.toString(Integer.parseInt(input))); // i think this will handle whitespace and some noninteger chars?
+                        }
+                    } catch (NumberFormatException notInteger){
+                        // handles non-integer input
+                        view.showErrorInvalidInput();
+                    }
                     break;
                 case TEXTENTRY:
                     gameSettings.setCurChoice(input);
@@ -327,7 +341,7 @@ public class TextInterfaceController implements InputHandler {
     private boolean checkInvalidPoint(String input) {
         char letter = input.toUpperCase().charAt(0);
         char number = input.charAt(1);
-        return letter < 'A' || letter > 'A' + game.size() || number < '0' || number > '0' + game.size();
+        return letter < 'A' || letter > 'A' + game.size() - 1 || number < '0' || number > '0' + game.size() - 1;
     }
 
     /**

@@ -38,7 +38,14 @@ public class GameSettings {
      * @return an entry (key, value) where key is the option and value is a list of possibilities
      */
     public Triple<String, OptionType, List<String>> getAvailableChoices() {
-        if (!isComplete()) return ENUM_OPTIONS.get(this.curSettingIndex);
+        if (!isComplete()) {
+            // user no longer prompted for cpu settings if cpu mode not selected
+            if (ENUM_OPTIONS.get(this.curSettingIndex).getFirst().equals("cpu difficulty")
+                    && !this.choices.get("mode").equals("cpu")){
+                this.curSettingIndex++;
+            }
+            return ENUM_OPTIONS.get(this.curSettingIndex);
+        }
         return null;
     }
 
