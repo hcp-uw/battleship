@@ -2,11 +2,15 @@ package battleship;
 
 public class TwoPlayerGame extends Game {
     public TwoPlayerGame(int boardSize, int[] shipsInfo) {
-        super(2, boardSize, shipsInfo);
+        super(2, 0, boardSize, shipsInfo);
     }
 
     public TwoPlayerGame(int boardSize) {
         super(2, boardSize);
+    }
+
+    public TwoPlayerGame(GameSettings g) {
+        super(g);
     }
 
     /**
