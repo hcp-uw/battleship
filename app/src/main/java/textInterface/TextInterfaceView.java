@@ -210,7 +210,6 @@ public class TextInterfaceView implements View {
             System.out.println(option);
         }
     }
-
     public void showOptionRange(int low, int high) {
         System.out.print(BLUE + "Enter a value between " + RESET + low + BLUE + " and " + RESET + high + BLUE + ": " + RESET);
     }
