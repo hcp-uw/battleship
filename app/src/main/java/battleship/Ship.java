@@ -1,5 +1,7 @@
 package battleship;
 
+import utils.Globals;
+
 /**
  * The Ship class represents a ship in the game of Battleship.
  */
@@ -37,13 +39,15 @@ public class Ship {
      * Throws an exception is the representation invariant is violated.
      */
     private void checkRep() {
-        assert (startPoint != null): "null start point";
-        assert (endPoint != null): "null end point";
-        assert (hp >= 0): "negative hp";
-        assert (startPoint.getX() == endPoint.getX() || startPoint.getY() == endPoint.getY()):
-                "start and end points do not span a vertical or horizontal line segment";
-        assert(startPoint.getX() <= endPoint.getX() && startPoint.getY() <= endPoint.getY()):
-                "start point is not above or to the left of end point";
+        if (Globals.DEBUG) {
+            assert (startPoint != null): "null start point";
+            assert (endPoint != null): "null end point";
+            assert (hp >= 0): "negative hp";
+            assert (startPoint.getX() == endPoint.getX() || startPoint.getY() == endPoint.getY()):
+                    "start and end points do not span a vertical or horizontal line segment";
+            assert(startPoint.getX() <= endPoint.getX() && startPoint.getY() <= endPoint.getY()):
+                    "start point is not above or to the left of end point";
+        }
     }
 
     /**

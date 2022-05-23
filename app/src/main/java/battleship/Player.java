@@ -1,6 +1,7 @@
 package battleship;
 
 import utils.PointUtils;
+import utils.Globals;
 
 import java.util.*;
 
@@ -33,15 +34,17 @@ public class Player {
     // for each ship in playerShips: ship != null &&
 
     private void checkRep() {
-        assert this.playerBoard != null : "Board cannot be null";
-        assert this.opponentBoards != null : "Opponent boards cannot be null";
-        assert this.playerShips != null : "Collection of ships cannot be null";
-        assert this.playerShips.size() != 0 : "Collection of ships must be non-empty";
-        assert this.playerShipPoints != null : "Ship Points should not be null";
+        if (Globals.DEBUG) {
+            assert this.playerBoard != null : "Board cannot be null";
+            assert this.opponentBoards != null : "Opponent boards cannot be null";
+            assert this.playerShips != null : "Collection of ships cannot be null";
+            assert this.playerShips.size() != 0 : "Collection of ships must be non-empty";
+            assert this.playerShipPoints != null : "Ship Points should not be null";
 
-        if (DEBUG) {
-            for (Ship s : this.playerShips) {
-                assert s != null : "Ships cannot be null";
+            if (DEBUG) {
+                for (Ship s : this.playerShips) {
+                    assert s != null : "Ships cannot be null";
+                }
             }
         }
     }
