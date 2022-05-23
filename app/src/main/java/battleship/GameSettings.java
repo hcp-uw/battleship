@@ -19,7 +19,7 @@ public class GameSettings {
     public static List<Triple<String, OptionType, List<String>>> ENUM_OPTIONS = List.of(
             new Triple<>("mode", OptionType.CHOICES, List.of("2player", "cpu")),
             new Triple<>("board size", OptionType.RANGE, List.of("5", "15")),
-            new Triple<>("cpu difficulty", OptionType.CHOICES, List.of("easy", "normal")),
+            new Triple<>("cpu difficulty", OptionType.CHOICES, List.of("easy", "normal", "difficult")),
             new Triple<>("player names", OptionType.TEXTENTRY, List.of()) // empty list represents free-form input
     );
 

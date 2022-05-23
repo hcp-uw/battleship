@@ -2,23 +2,19 @@ package battleship;
 
 public class ComputerPlayer extends Player {
 
-    private static final int DEFAULT_DIFFICULTY = 0;
-
     private AttackGenerator attackGenerator;
-
-    public ComputerPlayer(int id, Ship[] ships, int board_size) {
-        this(id, ships, board_size, DEFAULT_DIFFICULTY);
-    }
 
     public ComputerPlayer(int id, Ship[] ships, int board_size, int difficulty) {
         super(id, ships, board_size);
         switch (difficulty) {
-            case 0:
-                this.attackGenerator = new RandomAttackGenerator(board_size);
-                break;
             case 1:
                 this.attackGenerator = new SmartAttackGenerator(board_size);
                 break;
+            case 2:
+                this.attackGenerator = new SmartAttackGenerator(board_size);
+                break;
+            default:
+                this.attackGenerator = new RandomAttackGenerator(board_size);
         }
     }
 
@@ -33,6 +29,11 @@ public class ComputerPlayer extends Player {
             points[1] = new Point(points[0].getX(), points[0].getY() + (length - 1) * multiplier);
         }
         return points;
+    }
+
+    @Override
+    public void notifyHit() {
+        attackGenerator.notifyHit();
     }
 
     public Point getAttackPoint() {
