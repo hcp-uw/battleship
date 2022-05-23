@@ -57,7 +57,6 @@ public class SmartAttackGenerator extends AttackGenerator {
 
     @Override
     public void notifyHit() {
-        System.out.println("Hit");
         if (prev == null) {
             return;
         }
