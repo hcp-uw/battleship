@@ -4,6 +4,7 @@ package battleship;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import utils.Globals;
 
 // The Board class is a mutable object that represents a player's
 // nxn-sized playing board
@@ -43,19 +44,21 @@ public class Board {
     }
 
     private void checkRep() {
-        assert (hit != null && miss != null) : "Board must be instantiated";
-        assert (size >= 0) : "Size cannot be less than 0";
-        if (DEBUG) {
-            for (Point p : hit) {
-                assert (p != null) : "Points cannot be null";
-                assert (!miss.contains(p)) : "Points cannot be in both hit and miss";
-                assert (p.getX() >= 0 && p.getX() < size && p.getY() >= 0 && p.getY() < size)
-                        : "Points must exist in the board";
-            }
-            for (Point p : miss) {
-                assert (p != null) : "Points cannot be null";
-                assert (p.getX() >= 0 && p.getX() < size && p.getY() >= 0 && p.getY() < size)
-                        : "Points must exist in the board";
+        if (Globals.DEBUG) {
+            assert (hit != null && miss != null) : "Board must be instantiated";
+            assert (size >= 0) : "Size cannot be less than 0";
+            if (DEBUG) {
+                for (Point p : hit) {
+                    assert (p != null) : "Points cannot be null";
+                    assert (!miss.contains(p)) : "Points cannot be in both hit and miss";
+                    assert (p.getX() >= 0 && p.getX() < size && p.getY() >= 0 && p.getY() < size)
+                            : "Points must exist in the board";
+                }
+                for (Point p : miss) {
+                    assert (p != null) : "Points cannot be null";
+                    assert (p.getX() >= 0 && p.getX() < size && p.getY() >= 0 && p.getY() < size)
+                            : "Points must exist in the board";
+                }
             }
         }
     }
