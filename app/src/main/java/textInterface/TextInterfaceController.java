@@ -161,7 +161,6 @@ public class TextInterfaceController implements InputHandler {
                     break;
                 case TEXTENTRY:
                     gameSettings.setCurChoice(input);
-                    // TODO - make Game class actually set up the names when playernames received through here
                     break;
                 default:
                     // getting here indicates a programmer mistake
@@ -192,7 +191,6 @@ public class TextInterfaceController implements InputHandler {
      * @param choices list of string choices for the setting
      */
     private void settingsPrompt(String name, GameSettings.OptionType type, List<String> choices) {
-        // TODO: Game Settings calls to View
         view.setupPrompt(name);
         switch (type) {
             case CHOICES:
