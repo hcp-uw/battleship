@@ -257,13 +257,15 @@ public class TextInterfaceController implements InputHandler {
     private void doInputAttack(String input) {
         if (input.length() < 2 || checkInvalidPoint(input)) {
             view.showErrorUnknownInput();
-            attackPrompt();
+            view.attackPrompt();
             return;
         }
 
         // attack using the input point, and if invalid, display error
         if (!game.processTurn(new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0'))) {
             view.showErrorInvalidPosition();
+            view.attackPrompt();
+            return;
         }
 
         // read current phase
