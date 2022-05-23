@@ -178,6 +178,7 @@ public class TextInterfaceController implements InputHandler {
             // seems to be how the game was directly just started before
             view.placeShipPrompt();
             shipPointPrompt();
+
         } else {
             curOption = gameSettings.getAvailableChoices();
             settingsPrompt(curOption.getFirst(), curOption.getSecond(), curOption.getThird());

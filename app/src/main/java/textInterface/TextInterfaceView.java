@@ -152,7 +152,7 @@ public class TextInterfaceView implements View {
     }
 
     public void welcome(){
-        System.out.println("Welcome to Battleship!");
+        System.out.println(BLUE + "Welcome to Battleship!" + RESET);
     }
 
     //
@@ -162,7 +162,7 @@ public class TextInterfaceView implements View {
     @Override
     public void setupPrompt(String name) {
         // jason-  I am taking over this method for my uses since it wasn't completed nor fully specified
-        System.out.println("Setup [ " + name + " ]:");
+        System.out.println(BLUE + "-- Setup [ " + RESET + name + BLUE + " ] --" + RESET);
     }
 
     /**
@@ -198,9 +198,9 @@ public class TextInterfaceView implements View {
      * @param options the options
      */
     public void showOptionsEnumerated(List<String> options) {
-        System.out.println("Choose your option:");
+        System.out.println(BLUE + "Choose your option:" + RESET);
         for (int i = 0; i < options.size(); i++) {
-            System.out.println(i + 1 + " - " + options.get(i));
+            System.out.println("  " + BLUE + (i + 1) + " - " + RESET + options.get(i));
         }
     }
 
@@ -210,13 +210,12 @@ public class TextInterfaceView implements View {
             System.out.println(option);
         }
     }
-
     public void showOptionRange(int low, int high) {
-        System.out.print("Enter a value between " + low + " and " + high + ": ");
+        System.out.print(BLUE + "Enter a value between " + RESET + low + BLUE + " and " + RESET + high + BLUE + ": " + RESET);
     }
 
     public void showOptionFreeform() {
-        System.out.print("Enter text input: ");
+        System.out.print(BLUE + "Enter text input: " + RESET);
     }
 
     //
@@ -258,7 +257,7 @@ public class TextInterfaceView implements View {
     }
 
     public void playAgainPrompt(){
-        System.out.print("Would you like to play again? (y/n):");
+        System.out.print("Would you like to play again? (y/n): ");
     }
 
     @Override
