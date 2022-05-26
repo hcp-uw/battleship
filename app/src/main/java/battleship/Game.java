@@ -15,10 +15,25 @@ import java.util.*;
 public class Game {
 
     // represents ships of lengths [2, 3, 3, 4, 5]
-//    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 1, 0, 0};
+    // mostly just holding on to this for testing purposes
     private static final int[] DEFAULT_SHIPS = {0, 0, 1, 0, 0, 0};
     // default board size is 10x10
     private static final int DEFAULT_SIZE = 10;
+    // map of board size to ship length distribution
+    // ALTERNATIVE SOLUTION: use getShipInfo method for randomly chosen distribution that matches the 17:10 cells:boardSize ratio
+    private static final Map<Integer, int[]> SHIP_INFO = Map.ofEntries(
+            new AbstractMap.SimpleEntry<Integer, int[]>(5, new int[]{0, 0, 1, 1, 1, 0}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(6, new int[]{0, 0, 1, 1, 0, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(7, new int[]{0, 0, 1, 2, 1, 0}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(8, new int[]{0, 0, 1, 1, 1, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(9, new int[]{0, 0, 2, 1, 2, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(10, new int[]{0, 0, 1, 2, 1, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(11, new int[]{0, 0, 2, 2, 1, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(12, new int[]{0, 0, 2, 1, 2, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(13, new int[]{0, 0, 1, 2, 1, 2}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(14, new int[]{0, 0, 2, 2, 1, 2}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(15, new int[]{0, 0, 1, 2, 2, 2})
+    );
     // 3 phases of game
     private static final String[] GAME_PHASES = {"setup", "playing", "end"};
 
@@ -65,12 +80,14 @@ public class Game {
 
     // constructor assuming default ships
     public Game(int playerCount, int boardSize) {
-        this(playerCount, 0, 0, boardSize, DEFAULT_SHIPS);
+        this(playerCount, 0, 0, boardSize, SHIP_INFO.get(boardSize));
     }
 
     // constructor assuming default ships
     public Game(int playerCount, int cpuCount, int cpuDifficulty, int boardSize) {
-        this(playerCount, cpuCount, cpuDifficulty, boardSize, DEFAULT_SHIPS);
+        // TODO uncomment below after testing is done, delete line after
+        //this(playerCount, cpuCount, cpuDifficulty, boardSize, SHIP_INFO.get(boardSize));
+        this(playerCount, cpuCount, cpuDifficulty, boardSize, SHIP_INFO.get(DEFAULT_SIZE));
     }
 
     // constructor assuming default board size and ships
@@ -311,6 +328,40 @@ public class Game {
      */
     public int size() {
         return this.gameBoardSize;
+    }
+
+    /*
+     * Reads input boardSize, returns shipInfo to be used in constructor
+     */
+    private static int[] getShipInfo(int boardSize){
+        int[] shipInfo = new int[6];
+        getShipInfoHelper(shipInfo, boardSize);
+        return shipInfo;
+    }
+
+    private static boolean getShipInfoHelper(int[] b, int boardSize){
+        if (boardSize == 0){
+            return true;
+        } else if (boardSize < 2){
+            return false;
+        }
+        Vector<Integer> v = new Vector<>(List.of(2, 3, 4, 5));
+        while (!v.isEmpty()){
+            int temp = getRandomLength(v);
+            if (getShipInfoHelper(b, boardSize - temp)){
+                b[temp]++;
+                break;
+            }
+        }
+        return true;
+    }
+
+    private static int getRandomLength(Vector<Integer> v){
+        int index = (int)(Math.random() * v.size());
+        int temp = v.get(index);
+        v.set(index, v.get(v.size() - 1));
+        v.remove(v.size() - 1);
+        return temp;
     }
 
     /**
