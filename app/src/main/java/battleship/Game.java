@@ -90,9 +90,17 @@ public class Game {
              getGameSettingsCpuDifficulty(g), Integer.parseInt(g.getSetting("board size")));
         // hack way assumes player name input is delineated by spaces and in order
         String[] names = g.getSetting("player names").split(" ");
-        if (names.length != 0) {  // perhaps if want default names just no input?
-            for (int i = 0; i < playerIdList.size(); i++) {
+        if (names.length != 0) {
+            // set the first names.length players to the names given
+            int i;
+            for (i = 0; i < names.length; i++) {
                 setPlayerName(playerIdList.get(i), names[i]);
+            }
+            // set the rest to their IDs
+            for (int j = i; j < playerIdList.size(); j++) {
+                // set player name to player id
+                int pid = playerIdList.get(j);
+                setPlayerName(pid, "Player " + pid);
             }
         }
     }
