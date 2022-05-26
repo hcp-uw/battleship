@@ -335,7 +335,8 @@ public class Game {
      */
     private static int[] getShipInfo(int boardSize){
         int[] shipInfo = new int[6];
-        getShipInfoHelper(shipInfo, boardSize);
+        // based on default 17 cells:10 boardsize ratio of official Battlship
+        getShipInfoHelper(shipInfo, (int) (Math.round(17.0/10*boardSize)));
         return shipInfo;
     }
 
