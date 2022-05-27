@@ -85,9 +85,7 @@ public class Game {
 
     // constructor assuming default ships
     public Game(int playerCount, int cpuCount, int cpuDifficulty, int boardSize) {
-        // TODO uncomment below after testing is done, delete line after
-        //this(playerCount, cpuCount, cpuDifficulty, boardSize, SHIP_INFO.get(boardSize));
-        this(playerCount, cpuCount, cpuDifficulty, boardSize, SHIP_INFO.get(DEFAULT_SIZE));
+        this(playerCount, cpuCount, cpuDifficulty, boardSize, SHIP_INFO.get(boardSize));
     }
 
     // constructor assuming default board size and ships
