@@ -106,7 +106,7 @@ public class Game {
         // hack way assumes player name input is delineated by spaces and in order
         String[] names = g.getSetting("player names").split("\\s+");
         int i = 0;
-        if (names.length != 1 && names[0].isEmpty()) {
+        if (!(names.length == 1 && names[0].isEmpty())) {
             // set the first names.length players to the names given
             for (; i < names.length; i++) {
                 setPlayerName(playerIdList.get(i), names[i]);
