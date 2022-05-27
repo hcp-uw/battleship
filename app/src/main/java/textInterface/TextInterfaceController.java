@@ -83,9 +83,12 @@ public class TextInterfaceController implements InputHandler {
      */
     @Override
     public void handleInput(String input) {
-        if (input.isEmpty()) {
-            System.out.println(input);
-            return;
+        if (this.controllerPhase != 0) {
+            // empty input is invalid except for phases where there might be free-form input
+            if (input.isEmpty()) {
+//                System.out.println(input);
+                return;
+            }
         }
         switch (this.controllerPhase) {
             case 0:
@@ -129,7 +132,7 @@ public class TextInterfaceController implements InputHandler {
     private void doSettingsPhase(String input) {
         // settings phase consists of going through all the settings and setting them
         Triple<String, GameSettings.OptionType, List<String>> curOption = gameSettings.getAvailableChoices();
-        if (!input.equals("")) {
+        if (!input.equals("") || curOption.getSecond().equals(GameSettings.OptionType.TEXTENTRY)) {
             switch (curOption.getSecond()) {
                 case CHOICES:
                     try {
@@ -214,7 +217,8 @@ public class TextInterfaceController implements InputHandler {
      */
     private void doShipSetup(String input) {
         // check validity
-        if (p == null && (input.length() < 2 || checkInvalidPoint(input))) {
+        Point placementPoint = parsePoint(input);
+        if (p == null && placementPoint == null) {
             view.showErrorUnknownInput();
             view.placeShipOfLength(getShipLength());
             return;
@@ -226,7 +230,7 @@ public class TextInterfaceController implements InputHandler {
 
         // deal with input
         if (p == null) {
-            p = new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0');
+            p = placementPoint;
             game.processTurn(p);
             view.shipOrientationPrompt();
         } else {
@@ -255,14 +259,15 @@ public class TextInterfaceController implements InputHandler {
      * Responds to user's input to attack coordinates
      */
     private void doInputAttack(String input) {
-        if (input.length() < 2 || checkInvalidPoint(input)) {
+        Point attackPoint = parsePoint(input);
+        if (attackPoint == null) {
             view.showErrorUnknownInput();
             view.attackPrompt();
             return;
         }
 
         // attack using the input point, and if invalid, display error
-        if (!game.processTurn(new Point(input.toUpperCase().charAt(0) - 'A', input.charAt(1) - '0'))) {
+        if (!game.processTurn(attackPoint)) {
             view.showErrorInvalidPosition();
             view.attackPrompt();
             return;
@@ -337,12 +342,70 @@ public class TextInterfaceController implements InputHandler {
 
 
     /**
-     * private method to check if input point is valid
+     * private method to parse a String to a Point (returns null if the String
+     * corresponds with an invalid point for this game)
      */
-    private boolean checkInvalidPoint(String input) {
-        char letter = input.toUpperCase().charAt(0);
-        char number = input.charAt(1);
-        return letter < 'A' || letter > 'A' + game.size() - 1 || number < '0' || number > '0' + game.size() - 1;
+    private Point parsePoint(String input) {
+        int boardSize = game.size();
+        int numLetters = numLetters();
+        if (input.length() <= numLetters) {
+            return null;
+        }
+        String letterPortion = input.substring(0, numLetters);
+        int x = lettersToX(letterPortion);
+        if (x < 0) {
+            return null;
+        }
+        String numberPortion = input.substring(numLetters);
+        int y;
+        try {
+            y = Integer.parseInt(numberPortion);
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+        if (y < 0 || y >= boardSize) {
+            return null;
+        }
+        return new Point(x, y);
+    }
+
+    /**
+     * private method to return the number of letters for a valid
+     * input for the game (based on the game's size)
+     */
+    private int numLetters() {
+        int boardSize = game.size();
+        boardSize--;
+        int numLetters = 0;
+        while (boardSize > 0) {
+            numLetters++;
+            boardSize /= 26;
+        }
+        return numLetters;
+    }
+
+    /**
+     * private method to convert the "letter portion" of an input
+     * point to its corresponding x-coordinate on the board (returns
+     * a negative number if the letters do not correspond to a valid
+     * x-coordinate)
+     */
+    private int lettersToX(String letters) {
+        int x = 0;
+        letters = letters.toLowerCase();
+        for (int i = 0; i < letters.length(); i++) {
+            char c = letters.charAt(i);
+            if (c < 'a' || c > 'z') {
+                return -1;
+            }
+            x *= 26;
+            x += c - 'a' + 1;
+        }
+        x--;
+        if (x >= game.size()) {
+            return -1;
+        }
+        return x;
     }
 
     /**

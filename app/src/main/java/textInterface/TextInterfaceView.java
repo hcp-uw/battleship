@@ -92,10 +92,11 @@ public class TextInterfaceView implements View {
     }
 
     public void drawBoard(BoardView board, Set<Point> shipPoints) {
-//        int boardSize = 10;
+        // NOTE: currently works only for board sizes <= 26;
         int boardSize = board.size();
         StringBuilder builder = new StringBuilder();
-        builder.append(" ");
+        int maxNumberLength = Integer.toString(boardSize - 1).length();
+        builder.append(" ".repeat(maxNumberLength));
         for (char letter = 'A'; letter < 'A' + boardSize; letter++) {
             builder.append(" ");
             builder.append(letter);
@@ -104,7 +105,9 @@ public class TextInterfaceView implements View {
         Set<Point> hits = board.getHits();
         Set<Point> misses = board.getMisses();
         for (int i = 0; i < boardSize; i++) {
-            builder.append(i);
+            String numString = Integer.toString(i);
+            builder.append(" ".repeat(maxNumberLength - numString.length()));
+            builder.append(numString);
             for (int j = 0; j < boardSize; j++) {
                 builder.append(" ");
                 Point p = new Point(j, i);

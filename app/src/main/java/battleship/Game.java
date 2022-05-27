@@ -104,19 +104,19 @@ public class Game {
         this(getGameSettingsNumPlayers(g), getGameSettingsNumCpus(g),
              getGameSettingsCpuDifficulty(g), Integer.parseInt(g.getSetting("board size")));
         // hack way assumes player name input is delineated by spaces and in order
-        String[] names = g.getSetting("player names").split(" ");
-        if (names.length != 0) {
+        String[] names = g.getSetting("player names").split("\\s+");
+        int i = 0;
+        if (names.length != 1 && names[0].isEmpty()) {
             // set the first names.length players to the names given
-            int i;
-            for (i = 0; i < names.length; i++) {
+            for (; i < names.length; i++) {
                 setPlayerName(playerIdList.get(i), names[i]);
             }
-            // set the rest to their IDs
-            for (int j = i; j < playerIdList.size(); j++) {
-                // set player name to player id
-                int pid = playerIdList.get(j);
-                setPlayerName(pid, "Player " + pid);
-            }
+        }
+        // set the rest to their IDs
+        for (int j = i; j < playerIdList.size(); j++) {
+            // set player name to player id
+            int pid = playerIdList.get(j);
+            setPlayerName(pid, "Player " + pid);
         }
     }
 
