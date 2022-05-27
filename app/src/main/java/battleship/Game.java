@@ -1,5 +1,7 @@
 package battleship;
 
+import utils.PointUtils;
+
 import java.util.*;
 
 /**
@@ -13,16 +15,32 @@ import java.util.*;
 public class Game {
 
     // represents ships of lengths [2, 3, 3, 4, 5]
-    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 2, 1, 1};
+    // mostly just holding on to this for testing purposes
+    private static final int[] DEFAULT_SHIPS = {0, 0, 1, 0, 0, 0};
     // default board size is 10x10
     private static final int DEFAULT_SIZE = 10;
+    // map of board size to ship length distribution
+    // ALTERNATIVE SOLUTION: use getShipInfo method for randomly chosen distribution that matches the 17:10 cells:boardSize ratio
+    private static final Map<Integer, int[]> SHIP_INFO = Map.ofEntries(
+            new AbstractMap.SimpleEntry<Integer, int[]>(5, new int[]{0, 0, 1, 1, 1, 0}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(6, new int[]{0, 0, 1, 1, 0, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(7, new int[]{0, 0, 1, 2, 1, 0}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(8, new int[]{0, 0, 1, 1, 1, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(9, new int[]{0, 0, 2, 1, 2, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(10, new int[]{0, 0, 1, 2, 1, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(11, new int[]{0, 0, 2, 2, 1, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(12, new int[]{0, 0, 2, 1, 2, 1}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(13, new int[]{0, 0, 1, 2, 1, 2}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(14, new int[]{0, 0, 2, 2, 1, 2}),
+            new AbstractMap.SimpleEntry<Integer, int[]>(15, new int[]{0, 0, 1, 2, 2, 2})
+    );
     // 3 phases of game
     private static final String[] GAME_PHASES = {"setup", "playing", "end"};
 
     private final int gameBoardSize;
     private int currentGamePhase;
     private final Map<Integer, Player> players;
-    private final List<Integer> playerIdList; // a list containing PIDs
+    protected final List<Integer> playerIdList; // a list containing PIDs
     private int currentPlayerIndex; // current player represented by index in PID list
     private List<GameListener> listeners;
     private final int[] allowableShipSet;
@@ -43,9 +61,9 @@ public class Game {
      * @param boardSize the size of the boards for the game
      * @param shipsInfo a mapping of ship sizes to counts represented by an array where indices are the sizes
      */
-    public Game(int playerCount, int boardSize, int[] shipsInfo) {
+    public Game(int playerCount, int cpuCount, int cpuDifficulty, int boardSize, int[] shipsInfo) {
         this.players = new HashMap<>();
-        generatePlayers(playerCount, boardSize);
+        generatePlayers(playerCount, cpuCount, cpuDifficulty, boardSize);
 
         this.gameBoardSize = boardSize;
 
@@ -62,30 +80,107 @@ public class Game {
 
     // constructor assuming default ships
     public Game(int playerCount, int boardSize) {
-        this(playerCount, boardSize, DEFAULT_SHIPS);
+        this(playerCount, 0, 0, boardSize, SHIP_INFO.get(boardSize));
+    }
+
+    // constructor assuming default ships
+    public Game(int playerCount, int cpuCount, int cpuDifficulty, int boardSize) {
+        this(playerCount, cpuCount, cpuDifficulty, boardSize, SHIP_INFO.get(boardSize));
     }
 
     // constructor assuming default board size and ships
     public Game(int playerCount) {
-        this(playerCount, DEFAULT_SIZE, DEFAULT_SHIPS);
+        this(playerCount, 0, 0, DEFAULT_SIZE, DEFAULT_SHIPS);
     }
 
     // constructor assuming default board size
     // on SO someone recommended using Builder pattern for default values since java doesn't have
     // default parameters
     public Game(int playerCount, int[] shipsInfo) {
-        this(playerCount, DEFAULT_SIZE, shipsInfo);
+        this(playerCount, 0, 0, DEFAULT_SIZE, shipsInfo);
+    }
+
+    public Game(GameSettings g) {
+        this(getGameSettingsNumPlayers(g), getGameSettingsNumCpus(g),
+             getGameSettingsCpuDifficulty(g), Integer.parseInt(g.getSetting("board size")));
+        // hack way assumes player name input is delineated by spaces and in order
+        String[] names = g.getSetting("player names").split("\\s+");
+        int i = 0;
+        if (names.length != 1 && names[0].isEmpty()) {
+            // set the first names.length players to the names given
+            for (; i < names.length; i++) {
+                setPlayerName(playerIdList.get(i), names[i]);
+            }
+        }
+        // set the rest to their IDs
+        for (int j = i; j < playerIdList.size(); j++) {
+            // set player name to player id
+            int pid = playerIdList.get(j);
+            setPlayerName(pid, "Player " + pid);
+        }
+    }
+
+    /**
+     * get the number of human players from a GameSettings object based on its mode
+     * @param g the GameSettings to read
+     * @return an integer number of human players
+     */
+    static int getGameSettingsNumPlayers(GameSettings g) {
+        switch (g.getSetting("mode")) {
+            case "cpu":
+                return 1;
+            case "2player":
+                return 2;
+            default:
+                throw new RuntimeException("encountered a mode we don't know about");
+        }
+    }
+
+    /**
+     * get the number of cpu players from a GameSettings object based on its mode
+     * @param g the GameSettings to read
+     * @return an integer number of cpu players
+     */
+    static int getGameSettingsNumCpus(GameSettings g) {
+        switch (g.getSetting("mode")) {
+            case "cpu":
+                return 1;
+            case "2player":
+                return 0;
+            default:
+                throw new RuntimeException("encountered a mode we don't know about");
+        }
+    }
+
+    /**
+     * get the cpu difficulty from a GameSettings object
+     * @param g the GameSettings to read
+     * @return an integer cpu difficulty
+     */
+    static int getGameSettingsCpuDifficulty(GameSettings g) {
+        switch (g.getSetting("cpu difficulty")) {
+            case "normal":
+                return 1;
+            case "difficult":
+                return 2;
+            default:
+                return 0;
+        }
     }
 
     /**
      * makes players and puts them in this.players, assigning an ID to each
      * @param count the number of players to generate
      */
-    private void generatePlayers(int count, int boardSize) {
+    private void generatePlayers(int count, int cpucount, int cpudifficulty, int boardSize) {
         int baseId = 1;
         for (int i = 0; i < count; i++) {
-            int pid = baseId + 1;
+            int pid = baseId + i;
             this.players.put(pid, new Player(pid, new Ship[0], boardSize));
+        }
+        for (int j = 0; j < cpucount; j++) {
+            int pid = baseId + j + count;
+            this.players.put(pid, new ComputerPlayer(pid, new Ship[0], boardSize, cpudifficulty));
         }
     }
 
@@ -98,15 +193,14 @@ public class Game {
     public boolean processTurn(Point p) {
         boolean result = false;
         if (this.getPhase().equals("setup")) {
-            int bufSize = this.pointBuffer.size(); // TODO: make this work with the point + orientation way of specifying a ship
+            int bufSize = this.pointBuffer.size();
             if (bufSize % 2 == 1) {
                 result = this.addShip(this.getLastPoint(), p);
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {
                     if (isSetupPhaseDone()) {
                         endPhase();
-                    } else {
-                        endTurn();
                     }
+                    endTurn();
                 }
             }
             this.pointBuffer.add(p);
@@ -118,6 +212,35 @@ public class Game {
         }
         return result;
         // and do nothing if game phase is something else
+    }
+
+    public void computerProcessTurn() {
+        if (!(this.players.get(this.getCurrentPlayer()) instanceof ComputerPlayer)) {
+            throw new IllegalStateException("Cannot process computer turn for non-computer players");
+        }
+        ComputerPlayer computerPlayer = (ComputerPlayer) this.players.get(this.getCurrentPlayer());
+        if (this.getPhase().equals("setup")) {
+            for (int length = allowableShipSet.length - 1; length >= 0; length--) {
+                int index = allowableShipSet[length];
+                while (index > 0) {
+                    Point[] shipPoints = computerPlayer.generateShip(length);
+                    if (this.addShip(shipPoints[0], shipPoints[1])) {
+                        index--;
+                    }
+                }
+            }
+            if (this.isSetupPhaseDone()) {
+                this.endPhase();
+            }
+            this.endTurn();
+        } else if (this.getPhase().equals("playing")) {
+            while (!this.attack(this.getNextPlayer(), computerPlayer.getAttackPoint())){}
+            if (this.playerLost(this.getNextPlayer())){
+                this.endPhase(); // don't end the turn if the player has won - keep cur player as winner
+            } else {
+                this.endTurn();
+            }
+        }
     }
 
     /**
@@ -187,8 +310,13 @@ public class Game {
      */
     public List<BoardView> getPlayerView(int pid) {
         Player p = this.players.get(pid);
-        List<BoardView> out = p.getEnemyBoards();
-        out.add(0, p.getBoard());
+        List<BoardView> out = new ArrayList<>();
+        out.add(p.getBoard());
+        for (int otherPid : this.playerIdList) {
+            if (otherPid != pid) {
+                out.add(this.players.get(otherPid).getBoard());
+            }
+        }
         return out;
     }
 
@@ -198,6 +326,41 @@ public class Game {
      */
     public int size() {
         return this.gameBoardSize;
+    }
+
+    /*
+     * Reads input boardSize, returns shipInfo to be used in constructor
+     */
+    private static int[] getShipInfo(int boardSize){
+        int[] shipInfo = new int[6];
+        // based on default 17 cells:10 boardsize ratio of official Battlship
+        getShipInfoHelper(shipInfo, (int) (Math.round(17.0/10*boardSize)));
+        return shipInfo;
+    }
+
+    private static boolean getShipInfoHelper(int[] b, int boardSize){
+        if (boardSize == 0){
+            return true;
+        } else if (boardSize < 2){
+            return false;
+        }
+        Vector<Integer> v = new Vector<>(List.of(2, 3, 4, 5));
+        while (!v.isEmpty()){
+            int temp = getRandomLength(v);
+            if (getShipInfoHelper(b, boardSize - temp)){
+                b[temp]++;
+                break;
+            }
+        }
+        return true;
+    }
+
+    private static int getRandomLength(Vector<Integer> v){
+        int index = (int)(Math.random() * v.size());
+        int temp = v.get(index);
+        v.set(index, v.get(v.size() - 1));
+        v.remove(v.size() - 1);
+        return temp;
     }
 
     /**
@@ -214,19 +377,30 @@ public class Game {
         if (!this.getPhase().equals("setup")) throw new RuntimeException("Ships may only be added during setup");
 
         Ship toAdd = new Ship(p1, p2);
-        List<Ship> playerCurShips = this.players.get(this.getCurrentPlayer()).getShips();
-        for (Ship s : playerCurShips) {
-            if (shipsIntersect(toAdd, s)) {
+        Set<Point> playerShipPoints = this.players.get(this.getCurrentPlayer()).getShipPoints();
+        List<Point> toAddPoints = PointUtils.getPointsBetween(p1, p2);
+        for (Point p : toAddPoints) {
+            if (playerShipPoints.contains(p)) {
                 return false;
             }
         }
-        this.players.get(this.currentPlayerIndex).addShip(toAdd);
+        if (!shipInBounds(toAdd, this.gameBoardSize)) return false;
+        this.players.get(this.getCurrentPlayer()).addShip(toAdd);
+        return true;
+    }
+
+    private boolean shipInBounds(Ship s, int boardSize) {
+        List<Point> shipPoints = PointUtils.getPointsBetween(s.startPoint(), s.endPoint());
+        for (Point p : shipPoints) {
+            if (p.getX() < 0 || p.getX() > boardSize - 1) return false;
+            if (p.getY() < 0 || p.getY() > boardSize - 1) return false;
+        }
         return true;
     }
 
     private boolean shipsIntersect(Ship s1, Ship s2) {
-        List<Point> pointsS1 = getPointsBetween(s1.startPoint(), s1.endPoint());
-        List<Point> pointsS2 = getPointsBetween(s2.startPoint(), s2.endPoint());
+        List<Point> pointsS1 = PointUtils.getPointsBetween(s1.startPoint(), s1.endPoint());
+        List<Point> pointsS2 = PointUtils.getPointsBetween(s2.startPoint(), s2.endPoint());
 
         // not an efficient algorithm, shouldn't matter unless ships are large
         // there is definitely a mathematical way to check line intersections TODO look for that
@@ -236,30 +410,6 @@ public class Game {
             }
         }
         return false;
-    }
-
-    // helper to get all points in between two points in a line, vertically or horizontally
-    // inclusively
-    private List<Point> getPointsBetween(Point p1, Point p2) {
-        List<Point> out = new ArrayList<>();
-        int x1 = p1.getX();
-        int x2 = p2.getX();
-        int dx = x2 - x1;
-        if (dx == 0) { // ship is vertical
-            int y1 = p1.getY();
-            int y2 = p2.getY();
-            int dy = y2 - y1;
-            int dir = (dy < 0) ? -1 : 1;
-            for (int i = 0; i <= Math.abs(dy); i++) {
-                out.add(new Point(p2.getX(), y1 + i*dir));
-            }
-        } else { // ship must be horizontal
-            int dir = (dx < 0) ? -1 : 1;
-            for (int i = 0; i <= Math.abs(dx); i++) {
-                out.add(new Point(p2.getX(), x1 + i*dir));
-            }
-        }
-        return out;
     }
 
     /**
@@ -371,6 +521,9 @@ public class Game {
     public void endTurn() {
         // loop around the players
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playerIdList.size();
+        if (this.players.get(this.getCurrentPlayer()) instanceof ComputerPlayer) {
+            computerProcessTurn();
+        }
     }
 
     /**
@@ -413,6 +566,38 @@ public class Game {
      */
     public List<Ship> getCurrentPlayerShips() {
         return getPlayerShips(getCurrentPlayer());
+    }
+
+    /**
+     * gets all the points occupied by the ships of the current player
+     * the returned set should not be modified in any way
+     * @return a set of Points
+     */
+    public Set<Point> getCurrentPlayerShipPoints() {
+        return this.players.get(getCurrentPlayer()).getShipPoints();
+    }
+
+    /**
+     * returns if the specified player has lost
+     * @param pid the PID of the player whose ship to get
+     * @return true if the given player has lost
+     */
+    public boolean playerLost(int pid){ return this.players.get(pid).hasLost(); }
+
+    /**
+     * returns if the specified player has won
+     * @param pid the pid of the player to check for win
+     * @return true if the given player as won
+     */
+    public boolean playerWon(int pid) {
+        for (int otherPlayer : playerIdList) {
+            if (otherPlayer != pid) {
+                if (!playerLost(otherPlayer)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
 

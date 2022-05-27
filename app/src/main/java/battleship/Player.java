@@ -1,5 +1,8 @@
 package battleship;
 
+import utils.PointUtils;
+import utils.Globals;
+
 import java.util.*;
 
 /**
@@ -15,6 +18,7 @@ public class Player {
     private final Board playerBoard;
     private final Map<Player, Board> opponentBoards;
     private final List<Ship> playerShips;
+    private final Set<Point> playerShipPoints;
 
     // Abstraction Function:
     // playerBoard is this player's board with hit and misses on it
@@ -30,14 +34,17 @@ public class Player {
     // for each ship in playerShips: ship != null &&
 
     private void checkRep() {
-        assert this.playerBoard != null : "Board cannot be null";
-        assert this.opponentBoards != null : "Opponent boards cannot be null";
-        assert this.playerShips != null : "Collection of ships cannot be null";
-        assert this.playerShips.size() != 0 : "Collection of ships must be non-empty";
+        if (Globals.DEBUG) {
+            assert this.playerBoard != null : "Board cannot be null";
+            assert this.opponentBoards != null : "Opponent boards cannot be null";
+            assert this.playerShips != null : "Collection of ships cannot be null";
+            assert this.playerShips.size() != 0 : "Collection of ships must be non-empty";
+            assert this.playerShipPoints != null : "Ship Points should not be null";
 
-        if (DEBUG) {
-            for (Ship s : this.playerShips) {
-                assert s != null : "Ships cannot be null";
+            if (DEBUG) {
+                for (Ship s : this.playerShips) {
+                    assert s != null : "Ships cannot be null";
+                }
             }
         }
     }
@@ -52,7 +59,11 @@ public class Player {
     public Player(int id, Ship[] ships, int board_size) {
         if (ships == null) throw new IllegalArgumentException("Player's ships must exist!");
         this.playerShips = new ArrayList<>();
-        this.playerShips.addAll(Arrays.asList(ships));
+        this.playerShipPoints = new HashSet<>();
+
+        for (Ship s : ships) {
+            this.addShip(s);
+        }
 
         this.playerBoard = new Board(board_size);
         this.opponentBoards = new HashMap<>();
@@ -79,24 +90,27 @@ public class Player {
      */
     public void addShip(Ship s) {
         this.playerShips.add(s);
+        this.playerShipPoints.addAll(PointUtils.getPointsBetween(s.startPoint(), s.endPoint()));
     }
 
     /**
      * This player attacks another player and updates this player's board with the result.
      * @param other the other Player to target an attack on
      * @param p the point on the other Player's board to attack
-     * @throws IllegalArgumentException if any args are null
-     * @return a boolean indicating whether this attack was valid (targeted a cell that wasn't attacked before)
+     * @throws IllegalArgumentException if any args are null or if attacking position already attacked
      */
     public void attack(Player other, Point p) {
         if (other == null || p == null) throw new IllegalArgumentException("Null inputs to attack");
         checkRep();
-        // this means that player only knows about opponents after attacking them...
-        if (!this.opponentBoards.containsKey(other)) this.opponentBoards.put(other, new Board(BOARD_SIZE));
+        // TODO: this means that player only knows about opponents after attacking them...
+        if (!this.opponentBoards.containsKey(other)) this.opponentBoards.put(other, new Board(this.playerBoard.size()));
 
         boolean result = other.receive(p);
         boolean validResult;
-        if (result) validResult = this.opponentBoards.get(other).addHit(p);
+        if (result) {
+            validResult = this.opponentBoards.get(other).addHit(p);
+            this.notifyHit();
+        }
         else validResult = this.opponentBoards.get(other).addMiss(p);
         checkRep();
         if (!validResult) throw new IllegalArgumentException("Tried to attack position that was already guessed");
@@ -152,6 +166,28 @@ public class Player {
         return new ArrayList<>(this.playerShips);
     }
 
+    /**
+     * getter for the points occupied by this player's ships
+     * returned set and items inside should not be modified
+     * @return a set of points where each point is a point in one of this player's ships
+     */
+    public Set<Point> getShipPoints() {
+        return this.playerShipPoints;
+    }
+
+    /**
+     * Returns if all of the player's ships have sunk
+     * @return true if the player has lost
+     */
+    public boolean hasLost(){
+        for (Ship s: this.playerShips){
+            if (!s.isSunk()){
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof Player)) {
@@ -178,4 +214,10 @@ public class Player {
         return id + "\n" + ships + "\n" + board;
     }
 
+    /**
+     * Notifies this instance of Player that it has successfully hit its opponent
+     */
+    public void notifyHit(){
+
+    }
 }

@@ -41,9 +41,10 @@ public interface View {
     void drawBoard(BoardView board, List<Ship> ships);
 
     /**
-     * Displays a prompt to th
+     * Displays a prompt to the user to indicate they should set something up
+     * @param name String name of thing to prompt user to set up
      */
-    void setupPrompt();
+    void setupPrompt(String name);
 
     /**
      * Displays a prompt to the user about which position to attack on the board.

@@ -2,11 +2,15 @@ package battleship;
 
 public class TwoPlayerGame extends Game {
     public TwoPlayerGame(int boardSize, int[] shipsInfo) {
-        super(2, boardSize, shipsInfo);
+        super(2, 0, 0, boardSize, shipsInfo);
     }
 
     public TwoPlayerGame(int boardSize) {
         super(2, boardSize);
+    }
+
+    public TwoPlayerGame(GameSettings g) {
+        super(g);
     }
 
     /**
@@ -38,15 +42,19 @@ public class TwoPlayerGame extends Game {
                 if (isPlayerDoneWithSetup(getCurrentPlayer())) {
                     if (isSetupPhaseDone()) {
                         endPhase();
-                    } else {
-                        endTurn();
                     }
+                    endTurn();
                 }
             }
             super.pointBuffer.add(p);
         } else if (getPhase().equals("playing")) {
             result = this.attack(p);
             super.pointBuffer.add(p);
+            if (super.playerLost(getNextPlayer())){
+                super.endPhase(); // don't end the turn if the player has won - keep cur player as winner
+            } else if (result) {
+                endTurn();
+            }
         }
         return result;
         // and do nothing if game phase is something else
