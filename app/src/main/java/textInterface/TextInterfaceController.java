@@ -132,7 +132,7 @@ public class TextInterfaceController implements InputHandler {
     private void doSettingsPhase(String input) {
         // settings phase consists of going through all the settings and setting them
         Triple<String, GameSettings.OptionType, List<String>> curOption = gameSettings.getAvailableChoices();
-        if (!input.equals("")) {
+        if (!input.equals("") || curOption.getSecond().equals(GameSettings.OptionType.TEXTENTRY)) {
             switch (curOption.getSecond()) {
                 case CHOICES:
                     try {
