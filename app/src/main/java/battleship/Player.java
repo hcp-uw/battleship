@@ -103,7 +103,7 @@ public class Player {
         if (other == null || p == null) throw new IllegalArgumentException("Null inputs to attack");
         checkRep();
         // TODO: this means that player only knows about opponents after attacking them...
-        if (!this.opponentBoards.containsKey(other)) this.opponentBoards.put(other, new Board(BOARD_SIZE));
+        if (!this.opponentBoards.containsKey(other)) this.opponentBoards.put(other, new Board(this.playerBoard.size()));
 
         boolean result = other.receive(p);
         boolean validResult;
