@@ -83,9 +83,12 @@ public class TextInterfaceController implements InputHandler {
      */
     @Override
     public void handleInput(String input) {
-        if (input.isEmpty()) {
-            System.out.println(input);
-            return;
+        if (this.controllerPhase != 0) {
+            // empty input is invalid except for phases where there might be free-form input
+            if (input.isEmpty()) {
+//                System.out.println(input);
+                return;
+            }
         }
         switch (this.controllerPhase) {
             case 0:
